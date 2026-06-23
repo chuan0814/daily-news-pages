@@ -3,9 +3,15 @@ from __future__ import annotations
 import html
 import importlib.util
 import json
+import re
+import sys
+import urllib.error
+import urllib.request
 from collections import Counter, OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 from pathlib import Path
+from xml.etree import ElementTree
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -13,15 +19,198 @@ SOURCE_SCRIPT = BASE_DIR / "create_daily_news_doc_20260623.py"
 PRIMARY_OUTPUT = BASE_DIR / "每日新聞核心話題.html"
 LEGACY_OUTPUT = BASE_DIR / "每日新聞核心話題_近24小時_20260623.html"
 PAGES_OUTPUT = BASE_DIR / "index.html"
+TAIPEI_TZ = timezone(timedelta(hours=8))
+FETCH_WINDOW_HOURS = 6
+TARGET_COUNT = 30
+
+RSS_FEEDS = [
+    ("Yahoo新聞", "https://tw.news.yahoo.com/rss"),
+    ("TVBS新聞網", "https://news.tvbs.com.tw/web_api/play_feed_realtime"),
+    ("東森新聞網", "https://feeds.feedburner.com/ettoday/realtime"),
+]
+
+CHINATIMES_URL = "https://www.chinatimes.com/realtimenews/?chdtv"
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+}
 
 
 def load_news_items():
+    try:
+        live_items = fetch_recent_news()
+        if len(live_items) >= TARGET_COUNT:
+            return live_items[:TARGET_COUNT]
+        raise RuntimeError(f"最近 {FETCH_WINDOW_HOURS} 小時只抓到 {len(live_items)} 則，未達 {TARGET_COUNT} 則")
+    except Exception as exc:
+        if __name__ == "__main__":
+            raise
+        print(f"即時新聞抓取失敗，改用本地備援資料：{exc}", file=sys.stderr)
+
     spec = importlib.util.spec_from_file_location("daily_news_doc_20260623", SOURCE_SCRIPT)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"無法讀取新聞資料：{SOURCE_SCRIPT}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module.NEWS_ITEMS
+
+
+def fetch_url(url: str) -> str:
+    req = urllib.request.Request(url, headers=HEADERS)
+    with urllib.request.urlopen(req, timeout=25) as response:
+        raw = response.read()
+        charset = response.headers.get_content_charset() or "utf-8"
+    try:
+        return raw.decode(charset)
+    except UnicodeDecodeError:
+        return raw.decode("utf-8", errors="replace")
+
+
+def strip_tags(value: str) -> str:
+    value = re.sub(r"<[^>]+>", "", value or "")
+    value = html.unescape(value)
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def short_summary(title: str, description: str) -> str:
+    text = strip_tags(description) or title
+    text = re.sub(r"^[^：:]{1,12}[：:]", "", text).strip()
+    return text[:50]
+
+
+def parse_datetime(raw: str, now: datetime) -> datetime | None:
+    raw = strip_tags(raw)
+    if not raw:
+        return None
+    try:
+        dt = parsedate_to_datetime(raw)
+        return dt.astimezone(TAIPEI_TZ) if dt.tzinfo else dt.replace(tzinfo=TAIPEI_TZ)
+    except (TypeError, ValueError):
+        pass
+    for fmt in ("%Y-%m-%d %H:%M", "%Y/%m/%d %H:%M", "%m/%d %H:%M"):
+        try:
+            dt = datetime.strptime(raw, fmt)
+            if fmt == "%m/%d %H:%M":
+                dt = dt.replace(year=now.year)
+            return dt.replace(tzinfo=TAIPEI_TZ)
+        except ValueError:
+            continue
+    return None
+
+
+def classify_item(title: str, description: str, source_category: str = "") -> str:
+    text = f"{title} {description} {source_category}"
+    rules = [
+        ("電競遊戲", ["電競", "遊戲", "Steam", "Switch", "PS5", "Xbox", "英雄聯盟", "實況", "任天堂"]),
+        ("AI科技", ["AI", "人工智慧", "輝達", "NVIDIA", "台積電", "半導體", "晶片", "科技", "機器人", "資料中心"]),
+        ("財經/證券", ["台股", "股", "證券", "金管會", "匯率", "美元", "日圓", "財經", "經濟", "央行", "關稅", "基金", "投資"]),
+        ("政治", ["總統", "行政院", "立院", "立法院", "民進黨", "國民黨", "民眾黨", "罷免", "選舉", "市長", "政治"]),
+        ("國際", ["美國", "中國", "日本", "韓國", "歐盟", "以色列", "伊朗", "烏克蘭", "川普", "國際", "全球"]),
+    ]
+    for category, keywords in rules:
+        if any(keyword.lower() in text.lower() for keyword in keywords):
+            return category
+    return "國內"
+
+
+def parse_rss_feed(source: str, url: str, now: datetime) -> list[dict[str, str]]:
+    xml_text = fetch_url(url)
+    root = ElementTree.fromstring(xml_text.encode("utf-8"))
+    items = []
+    cutoff = now - timedelta(hours=FETCH_WINDOW_HOURS)
+    for node in root.findall(".//item"):
+        get = lambda name: (node.findtext(name) or "").strip()
+        title = strip_tags(get("title"))
+        link = strip_tags(get("link"))
+        description = get("description")
+        pub_date = parse_datetime(get("pubDate") or get("published"), now)
+        if not title or not link or pub_date is None or pub_date < cutoff or pub_date > now + timedelta(minutes=10):
+            continue
+        category_hint = get("category")
+        items.append({
+            "category": classify_item(title, description, category_hint),
+            "source": source,
+            "time": pub_date.strftime("%m/%d %H:%M"),
+            "title": title,
+            "summary": short_summary(title, description),
+            "url": link,
+            "_sort_time": pub_date.isoformat(),
+        })
+    return items
+
+
+def parse_chinatimes(now: datetime) -> list[dict[str, str]]:
+    page = fetch_url(CHINATIMES_URL)
+    cutoff = now - timedelta(hours=FETCH_WINDOW_HOURS)
+    pattern = re.compile(
+        r'<h3 class="title"><a href="(?P<link>[^"]+)">(?P<title>.*?)</a></h3>\s*'
+        r'<div class="meta-info">\s*<time datetime="(?P<time>[^"]+)".*?</time>\s*'
+        r'<div class="category"><a [^>]*>(?P<category>.*?)</a></div>\s*</div>\s*'
+        r'<p class="intro">(?P<summary>.*?)</p>',
+        re.S,
+    )
+    items = []
+    for match in pattern.finditer(page):
+        title = strip_tags(match.group("title"))
+        description = strip_tags(match.group("summary"))
+        pub_date = parse_datetime(match.group("time"), now)
+        if not title or pub_date is None or pub_date < cutoff or pub_date > now + timedelta(minutes=10):
+            continue
+        link = match.group("link")
+        if link.startswith("/"):
+            link = "https://www.chinatimes.com" + link
+        category_hint = strip_tags(match.group("category"))
+        items.append({
+            "category": classify_item(title, description, category_hint),
+            "source": "中時新聞網",
+            "time": pub_date.strftime("%m/%d %H:%M"),
+            "title": title,
+            "summary": short_summary(title, description),
+            "url": link,
+            "_sort_time": pub_date.isoformat(),
+        })
+    return items
+
+
+def fetch_recent_news() -> list[dict[str, str]]:
+    now = datetime.now(TAIPEI_TZ)
+    fetched: list[dict[str, str]] = []
+    errors: list[str] = []
+
+    for source, url in RSS_FEEDS:
+        try:
+            fetched.extend(parse_rss_feed(source, url, now))
+        except (urllib.error.URLError, ElementTree.ParseError, TimeoutError, ValueError) as exc:
+            errors.append(f"{source}: {exc}")
+
+    try:
+        fetched.extend(parse_chinatimes(now))
+    except (urllib.error.URLError, TimeoutError, ValueError) as exc:
+        errors.append(f"中時新聞網: {exc}")
+
+    seen = set()
+    unique_items = []
+    preferred_categories = {"政治", "國際", "財經/證券", "AI科技", "電競遊戲"}
+    for item in sorted(fetched, key=lambda row: row["_sort_time"], reverse=True):
+        key = re.sub(r"\W+", "", item["title"].lower())
+        if key in seen:
+            continue
+        seen.add(key)
+        cleaned = {k: v for k, v in item.items() if not k.startswith("_")}
+        unique_items.append(cleaned)
+
+    focused = [item for item in unique_items if item["category"] in preferred_categories]
+    source_order = ["Yahoo新聞", "中時新聞網", "TVBS新聞網", "東森新聞網"]
+    source_buckets = {source: [item for item in focused if item["source"] == source] for source in source_order}
+    balanced: list[dict[str, str]] = []
+    while len(balanced) < TARGET_COUNT and any(source_buckets.values()):
+        for source in source_order:
+            if source_buckets[source] and len(balanced) < TARGET_COUNT:
+                balanced.append(source_buckets[source].pop(0))
+    combined = balanced + [item for item in focused if item not in balanced] + [item for item in unique_items if item not in focused]
+    if len(combined) < TARGET_COUNT and errors:
+        raise RuntimeError("; ".join(errors))
+    return combined[:TARGET_COUNT]
 
 
 def parse_sort_key(item: dict[str, str]) -> tuple[int, str]:
@@ -761,6 +950,8 @@ def write_outputs(content: str):
 
 def main():
     news_items = load_news_items()
+    if len(news_items) < TARGET_COUNT:
+        raise RuntimeError(f"新聞數不足：只取得 {len(news_items)} 則")
     content = build_html(news_items)
     write_outputs(content)
     print(f"HTML 已輸出：{PRIMARY_OUTPUT}")
