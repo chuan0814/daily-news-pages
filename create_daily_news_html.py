@@ -100,6 +100,12 @@ def parse_datetime(raw: str, now: datetime) -> datetime | None:
 
 def classify_item(title: str, description: str, source_category: str = "") -> str:
     text = f"{title} {description} {source_category}"
+
+    def has_keyword(keyword: str) -> bool:
+        if keyword.isascii():
+            return re.search(rf"(?<![A-Za-z0-9]){re.escape(keyword)}(?![A-Za-z0-9])", text, re.I) is not None
+        return keyword.lower() in text.lower()
+
     rules = [
         ("電競遊戲", ["電競", "遊戲", "Steam", "Switch", "PS5", "Xbox", "英雄聯盟", "實況", "任天堂"]),
         ("AI科技", ["AI", "人工智慧", "輝達", "NVIDIA", "台積電", "半導體", "晶片", "科技", "機器人", "資料中心"]),
@@ -108,7 +114,7 @@ def classify_item(title: str, description: str, source_category: str = "") -> st
         ("國際", ["美國", "中國", "日本", "韓國", "歐盟", "以色列", "伊朗", "烏克蘭", "川普", "國際", "全球"]),
     ]
     for category, keywords in rules:
-        if any(keyword.lower() in text.lower() for keyword in keywords):
+        if any(has_keyword(keyword) for keyword in keywords):
             return category
     return "國內"
 
