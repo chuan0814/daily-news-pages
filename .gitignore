@@ -1,0 +1,14 @@
+__pycache__/
+tmp_render/
+rendered_20260606/
+rendered_20260611/
+rendered_20260623/
+daily_news_20260623_verify.docx
+*.pyc
+*.docx
+AGENTS.md
+test_utf8.txt
+generate_news_doc.ps1
+create_daily_news_doc_*.py
+create_daily_news_html_20260623.py
+新聞提示詞/

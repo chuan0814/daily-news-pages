@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>每日新聞核心話題 即時版</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #eef3f8;
+      --surface: #ffffff;
+      --surface-2: #f7fafe;
+      --line: #d7e0eb;
+      --text: #122033;
+      --muted: #617286;
+      --accent: #0b57d0;
+      --accent-2: #08306b;
+      --accent-soft: #e9f1ff;
+      --shadow: 0 10px 28px rgba(15, 35, 55, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    a:hover { text-decoration: underline; }
+    .page {
+      width: min(1360px, calc(100% - 28px));
+      margin: 18px auto 34px;
+    }
+    .hero {
+      background: linear-gradient(135deg, #0a2342, #154c79 68%, #1c7293);
+      color: #fff;
+      border-radius: 8px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 32px;
+      line-height: 1.2;
+    }
+    .hero p {
+      margin: 6px 0;
+      color: rgba(255,255,255,0.9);
+      font-size: 14px;
+    }
+    .hero-side {
+      min-width: 240px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .hero-side strong {
+      display: block;
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 6px;
+    }
+    .hero-side span {
+      display: block;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .hero-side small {
+      display: block;
+      font-size: 12px;
+      color: rgba(255,255,255,0.86);
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .toolbar-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+    }
+    .toolbar-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .search-input {
+      width: 100%;
+      height: 42px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 0 14px;
+      font-size: 15px;
+      outline: none;
+      background: #fff;
+    }
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.12);
+    }
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .filter-chip {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .filter-chip span {
+      color: var(--muted);
+      margin-left: 4px;
+    }
+    .filter-chip.is-active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .filter-chip.is-active span {
+      color: rgba(255,255,255,0.88);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+    .stat-card-wide {
+      grid-column: span 2;
+    }
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .stat-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--accent-2);
+    }
+    .stat-value-small {
+      font-size: 22px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-2);
+      font-size: 13px;
+    }
+    .chip em {
+      color: var(--muted);
+      font-style: normal;
+    }
+    .lead-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .lead-card, .category-block, .table-panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+    .lead-card {
+      padding: 16px;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+    }
+    .lead-meta, .item-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .badge-soft {
+      background: var(--accent-soft);
+      color: var(--accent-2);
+    }
+    .lead-card h2 {
+      margin: 14px 0 10px;
+      font-size: 20px;
+      line-height: 1.35;
+    }
+    .lead-card p {
+      margin: 0;
+      color: #36495f;
+      font-size: 14px;
+    }
+    .lead-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .category-stack {
+      display: grid;
+      gap: 16px;
+    }
+    .category-block {
+      padding: 16px;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+    .section-head span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .news-item {
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .item-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 28px;
+      border-radius: 999px;
+      background: #dce9ff;
+      color: var(--accent-2);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .item-source {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .item-top time {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .news-item h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+    .news-item p {
+      margin: 0 0 10px;
+      color: #3b4d61;
+      font-size: 14px;
+    }
+    .table-panel {
+      margin-top: 18px;
+      overflow: hidden;
+    }
+    .panel-head {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+    .panel-head h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+    .panel-head span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .table-wrap {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      min-width: 1050px;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: #edf4ff;
+      color: #15385a;
+      z-index: 1;
+    }
+    .cell-index {
+      width: 60px;
+      text-align: center;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .cell-title {
+      min-width: 320px;
+      font-weight: 700;
+    }
+    .empty-state {
+      display: none;
+      background: #fff7f6;
+      border: 1px solid #f3d2cf;
+      color: #7a2620;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin: 18px 0 0;
+    }
+    .footer-note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 14px;
+      text-align: center;
+    }
+    .hidden {
+      display: none !important;
+    }
+    @media (max-width: 1180px) {
+      .lead-grid, .news-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 860px) {
+      .page {
+        width: min(100% - 18px, 100%);
+        margin: 10px auto 24px;
+      }
+      .hero {
+        padding: 18px;
+      }
+      .hero-top, .toolbar {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+      .hero h1 {
+        font-size: 26px;
+      }
+      .lead-grid, .news-grid, .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .stat-card-wide {
+        grid-column: auto;
+      }
+      .panel-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>每日新聞核心話題 即時版</h1>
+          <p>聚焦最近 6 小時內的重要新聞，來源限定 Yahoo新聞、中時新聞網、TVBS新聞網、東森新聞網。</p>
+          <p>主題涵蓋政治、財經、證券、AI科技、電競遊戲，方便你直接在瀏覽器閱讀。</p>
+        </div>
+        <aside class="hero-side">
+          <strong>最後更新</strong>
+          <span id="updatedAt">2026/06/23 14:51</span>
+          <small>排程時間：每日 01:00 / 07:00 / 13:00 / 19:00</small>
+        </aside>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-card">
+          <div class="toolbar-label">搜尋標題、摘要或來源</div>
+          <input id="searchInput" class="search-input" type="search" placeholder="例如：台積電、AI、以色列、遊戲股">
+        </div>
+        <div class="toolbar-card">
+          <div class="toolbar-label">依類別篩選</div>
+          <div class="filter-row" id="filterRow">
+            <button class="filter-chip is-active" type="button" data-filter="全部">全部</button><button class="filter-chip" type="button" data-filter="財經/證券">財經/證券 <span>5</span></button><button class="filter-chip" type="button" data-filter="政治">政治 <span>7</span></button><button class="filter-chip" type="button" data-filter="國際">國際 <span>8</span></button><button class="filter-chip" type="button" data-filter="AI科技">AI科技 <span>8</span></button><button class="filter-chip" type="button" data-filter="電競遊戲">電競遊戲 <span>2</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">本輪新聞數</div>
+        <div class="stat-value">30</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">更新頻率</div>
+        <div class="stat-value stat-value-small">每 6 小時</div>
+      </div>
+      <div class="stat-card stat-card-wide">
+        <div class="stat-label">來源分布</div>
+        <div class="chips"><span class="chip"><strong>東森新聞網</strong><em>6 則</em></span><span class="chip"><strong>中時新聞網</strong><em>8 則</em></span><span class="chip"><strong>TVBS新聞網</strong><em>8 則</em></span><span class="chip"><strong>Yahoo新聞</strong><em>8 則</em></span></div>
+      </div>
+      <div class="stat-card stat-card-wide">
+        <div class="stat-label">類別分布</div>
+        <div class="chips"><span class="chip"><strong>財經/證券</strong><em>5 則</em></span><span class="chip"><strong>政治</strong><em>7 則</em></span><span class="chip"><strong>國際</strong><em>8 則</em></span><span class="chip"><strong>AI科技</strong><em>8 則</em></span><span class="chip"><strong>電競遊戲</strong><em>2 則</em></span></div>
+      </div>
+    </section>
+    
+
+    <section class="lead-grid" id="leadGrid">
+      
+            <article class="lead-card" data-category="財經/證券" data-source="東森新聞網">
+              <div class="lead-meta">
+                <span class="badge">1</span>
+                <span class="badge badge-soft">財經/證券</span>
+                <span class="badge badge-soft">東森新聞網</span>
+              </div>
+              <h2>台股衝上48K後翻黑！震盪近千點 台積刷天價</h2>
+              <p>台股衝高後急殺近千點，台積電創高後帶動盤勢劇烈震盪。</p>
+              <div class="lead-footer">
+                <span>06/23 13:42</span>
+                <a href="https://news.ebc.net.tw/news/business/557845" target="_blank" rel="noopener noreferrer">查看原文</a>
+              </div>
+            </article>
+            
+            <article class="lead-card" data-category="政治" data-source="中時新聞網">
+              <div class="lead-meta">
+                <span class="badge">2</span>
+                <span class="badge badge-soft">政治</span>
+                <span class="badge badge-soft">中時新聞網</span>
+              </div>
+              <h2>高雄市長民調 柯志恩46.8%領先賴瑞隆</h2>
+              <p>高雄選情升溫，新民調顯示柯志恩領先賴瑞隆4.8個百分點。</p>
+              <div class="lead-footer">
+                <span>2026/06/23</span>
+                <a href="https://www.chinatimes.com/realtimenews/20260623001900-260407" target="_blank" rel="noopener noreferrer">查看原文</a>
+              </div>
+            </article>
+            
+            <article class="lead-card" data-category="國際" data-source="TVBS新聞網">
+              <div class="lead-meta">
+                <span class="badge">3</span>
+                <span class="badge badge-soft">國際</span>
+                <span class="badge badge-soft">TVBS新聞網</span>
+              </div>
+              <h2>金正恩批日本軍事化 核武是唯一出路</h2>
+              <p>金正恩再批日本軍事化，並強調北韓核武路線不變。</p>
+              <div class="lead-footer">
+                <span>2026/06/23</span>
+                <a href="https://news.tvbs.com.tw/world/3238264" target="_blank" rel="noopener noreferrer">查看原文</a>
+              </div>
+            </article>
+            
+            <article class="lead-card" data-category="政治" data-source="TVBS新聞網">
+              <div class="lead-meta">
+                <span class="badge">4</span>
+                <span class="badge badge-soft">政治</span>
+                <span class="badge badge-soft">TVBS新聞網</span>
+              </div>
+              <h2>鄭麗文喊當造局者 2028布局受矚</h2>
+              <p>國民黨公布訪陸紀錄片，鄭麗文2028布局聯想升溫。</p>
+              <div class="lead-footer">
+                <span>2026/06/23</span>
+                <a href="https://news.tvbs.com.tw/politics/3238346" target="_blank" rel="noopener noreferrer">查看原文</a>
+              </div>
+            </article>
+            
+    </section>
+
+    <div class="empty-state" id="emptyState">目前沒有符合搜尋或篩選條件的新聞。</div>
+
+    <section class="category-stack" id="categoryStack">
+      
+            <section class="category-block" data-category-group="財經/證券">
+              <div class="section-head">
+                <h2>財經/證券</h2>
+                <span>5 則</span>
+              </div>
+              <div class="news-grid">
+                
+                <article class="news-item" data-category="財經/證券" data-source="東森新聞網" data-title="台股衝上48K後翻黑！震盪近千點 台積刷天價">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">01</span>
+                      <span class="item-source">東森新聞網</span>
+                    </div>
+                    <time>06/23 13:42</time>
+                  </div>
+                  <h3>台股衝上48K後翻黑！震盪近千點 台積刷天價</h3>
+                  <p>台股衝高後急殺近千點，台積電創高後帶動盤勢劇烈震盪。</p>
+                  <a href="https://news.ebc.net.tw/news/business/557845" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="財經/證券" data-source="中時新聞網" data-title="融資餘額首破6000億引爆賣壓">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">06</span>
+                      <span class="item-source">中時新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>融資餘額首破6000億引爆賣壓</h3>
+                  <p>融資餘額刷新歷史高點，台股衝高後獲利了結賣壓湧出。</p>
+                  <a href="https://www.chinatimes.com/realtimenews/20260623002154-260410" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="財經/證券" data-source="Yahoo新聞" data-title="日圓逼近40年新低 官方表態將干預支撐匯率">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">14</span>
+                      <span class="item-source">Yahoo新聞</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>日圓逼近40年新低 官方表態將干預支撐匯率</h3>
+                  <p>日圓續貶逼近40年低點，日本與美國準備出手穩匯。</p>
+                  <a href="https://tw.news.yahoo.com/%E6%97%A5%E5%9C%93%E9%80%BC%E8%BF%9140%E5%B9%B4%E6%96%B0%E4%BD%8E-%E5%AE%98%E6%96%B9%E8%A1%A8%E6%85%8B%E5%B0%87%E5%B9%B2%E9%A0%90%E6%94%AF%E6%92%90%E5%8C%AF%E7%8E%87-052946957.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="財經/證券" data-source="TVBS新聞網" data-title="日圓歷史性走貶 美日財長緊急會議">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">15</span>
+                      <span class="item-source">TVBS新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>日圓歷史性走貶 美日財長緊急會議</h3>
+                  <p>日圓貶破161，美日財長緊急開會商議匯率穩定方案。</p>
+                  <a href="https://news.tvbs.com.tw/world/3238053" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="財經/證券" data-source="中時新聞網" data-title="台股創高後狂震千點 收盤跌640點">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">18</span>
+                      <span class="item-source">中時新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>台股創高後狂震千點 收盤跌640點</h3>
+                  <p>台股早盤創高後翻黑重挫，終場跌640點、成交量放大。</p>
+                  <a href="https://www.chinatimes.com/realtimenews/20260623002530-260410" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="category-block" data-category-group="政治">
+              <div class="section-head">
+                <h2>政治</h2>
+                <span>7 則</span>
+              </div>
+              <div class="news-grid">
+                
+                <article class="news-item" data-category="政治" data-source="中時新聞網" data-title="高雄市長民調 柯志恩46.8%領先賴瑞隆">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">02</span>
+                      <span class="item-source">中時新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>高雄市長民調 柯志恩46.8%領先賴瑞隆</h3>
+                  <p>高雄選情升溫，新民調顯示柯志恩領先賴瑞隆4.8個百分點。</p>
+                  <a href="https://www.chinatimes.com/realtimenews/20260623001900-260407" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="政治" data-source="TVBS新聞網" data-title="鄭麗文喊當造局者 2028布局受矚">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">04</span>
+                      <span class="item-source">TVBS新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>鄭麗文喊當造局者 2028布局受矚</h3>
+                  <p>國民黨公布訪陸紀錄片，鄭麗文2028布局聯想升溫。</p>
+                  <a href="https://news.tvbs.com.tw/politics/3238346" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="政治" data-source="Yahoo新聞" data-title="農業部：樂見兩岸貿易但不得私簽MOU">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">05</span>
+                      <span class="item-source">Yahoo新聞</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>農業部：樂見兩岸貿易但不得私簽MOU</h3>
+                  <p>鳳梨釋迦輸陸爭議延燒，農業部強調貿易可行但須依法。</p>
+                  <a href="https://tw.news.yahoo.com/%E8%BE%B2%E6%A5%AD%E9%83%A8%E9%95%B7%E9%99%B3%E9%A7%BF%E5%AD%A3%E8%A1%A8%E6%85%8B%E4%BA%86-%E6%A8%82%E8%A6%8B%E5%85%A9%E5%B2%B8%E8%B2%BF%E6%98%93%E4%BD%86%E4%B8%8D%E5%BE%97%E7%A7%81%E7%B0%BDmou-051435636.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="政治" data-source="TVBS新聞網" data-title="新竹空軍基地爆炸聲 起火原因曝光">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">16</span>
+                      <span class="item-source">TVBS新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>新竹空軍基地爆炸聲 起火原因曝光</h3>
+                  <p>新竹油料分庫清洗作業氣爆，1名工人受傷送醫。</p>
+                  <a href="https://news.tvbs.com.tw/politics/3238137" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="政治" data-source="Yahoo新聞" data-title="打造無人機非紅供應鏈 民進黨籲速通過2100億預算">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">17</span>
+                      <span class="item-source">Yahoo新聞</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>打造無人機非紅供應鏈 民進黨籲速通過2100億預算</h3>
+                  <p>綠營催過無人機預算，拚國防自主、產業升級與台美合作。</p>
+                  <a href="https://tw.news.yahoo.com/%E6%89%93%E9%80%A0%E7%84%A1%E4%BA%BA%E6%A9%9F-%E9%9D%9E%E7%B4%85%E4%BE%9B%E6%87%89%E9%8F%88-%E6%B0%91%E9%80%B2%E9%BB%A8%E7%B1%B2%E5%84%98%E9%80%9F%E9%80%9A%E9%81%8E2100%E5%84%84%E9%A0%90%E7%AE%97-051420821.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="政治" data-source="東森新聞網" data-title="資安院內鬼入侵 院長林盈達請辭">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">27</span>
+                      <span class="item-source">東森新聞網</span>
+                    </div>
+                    <time>2026/06/22</time>
+                  </div>
+                  <h3>資安院內鬼入侵 院長林盈達請辭</h3>
+                  <p>院內員工涉駭公文系統，資安院長請辭扛責。</p>
+                  <a href="https://news.ebc.net.tw/news/politics/557768" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="政治" data-source="東森新聞網" data-title="14天教召全面上路 取消1次抵2次">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">30</span>
+                      <span class="item-source">東森新聞網</span>
+                    </div>
+                    <time>2026/06/22</time>
+                  </div>
+                  <h3>14天教召全面上路 取消1次抵2次</h3>
+                  <p>今年起教召統一14天，取消舊制折抵優惠並強化實戰編組。</p>
+                  <a href="https://news.ebc.net.tw/news/politics/557760" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="category-block" data-category-group="國際">
+              <div class="section-head">
+                <h2>國際</h2>
+                <span>8 則</span>
+              </div>
+              <div class="news-grid">
+                
+                <article class="news-item" data-category="國際" data-source="TVBS新聞網" data-title="金正恩批日本軍事化 核武是唯一出路">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">03</span>
+                      <span class="item-source">TVBS新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>金正恩批日本軍事化 核武是唯一出路</h3>
+                  <p>金正恩再批日本軍事化，並強調北韓核武路線不變。</p>
+                  <a href="https://news.tvbs.com.tw/world/3238264" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="國際" data-source="東森新聞網" data-title="荷莫茲海峽航運復甦 24小時26船通過">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">07</span>
+                      <span class="item-source">東森新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>荷莫茲海峽航運復甦 24小時26船通過</h3>
+                  <p>荷莫茲航運量略回升，24小時已有26艘船通過。</p>
+                  <a href="https://news.ebc.net.tw/news/world/557830" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="國際" data-source="中時新聞網" data-title="荷姆茲海峽重啟 原油期貨走跌">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">08</span>
+                      <span class="item-source">中時新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>荷姆茲海峽重啟 原油期貨走跌</h3>
+                  <p>市場押注航道恢復運輸，國際油價連續回落。</p>
+                  <a href="https://www.chinatimes.com/realtimenews/20260623002567-260410" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="國際" data-source="Yahoo新聞" data-title="美允伊朗賣石油以美元結算">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">10</span>
+                      <span class="item-source">Yahoo新聞</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>美允伊朗賣石油以美元結算</h3>
+                  <p>美國鬆綁對伊石油美元結算，換取核查與航運承諾。</p>
+                  <a href="https://tw.news.yahoo.com/%E6%95%B8%E5%8D%81%E5%B9%B4%E4%BE%86%E6%9C%80%E9%87%8D%E5%A4%A7%E7%AA%81%E7%A0%B4-%E7%BE%8E%E5%9C%8B%E5%85%81%E4%BC%8A%E6%9C%97%E8%B3%A3%E7%9F%B3%E6%B2%B9%E4%BB%A5%E7%BE%8E%E5%85%83%E7%B5%90%E7%AE%97-044536031.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="國際" data-source="中時新聞網" data-title="美伊設荷莫茲熱線 伊朗拒買美農產">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">11</span>
+                      <span class="item-source">中時新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>美伊設荷莫茲熱線 伊朗拒買美農產</h3>
+                  <p>美伊首輪談完浮現分歧，伊朗稱無義務加碼買美農產品。</p>
+                  <a href="https://www.chinatimes.com/realtimenews/20260623001681-260408" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="國際" data-source="TVBS新聞網" data-title="歐洲熱浪肆虐 法西飆破40度">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">13</span>
+                      <span class="item-source">TVBS新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>歐洲熱浪肆虐 法西飆破40度</h3>
+                  <p>歐洲多國高溫破40度，法國、西班牙發布紅色警報。</p>
+                  <a href="https://news.tvbs.com.tw/world/3238156" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="國際" data-source="TVBS新聞網" data-title="伊朗擬設荷姆茲熱線 航道改由德黑蘭管">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">22</span>
+                      <span class="item-source">TVBS新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>伊朗擬設荷姆茲熱線 航道改由德黑蘭管</h3>
+                  <p>伊朗同意設熱線處理船舶通行，海峽管理主導權升高。</p>
+                  <a href="https://news.tvbs.com.tw/world/3238177" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="國際" data-source="中時新聞網" data-title="英相施凱爾請辭 工黨接班戰展開">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">28</span>
+                      <span class="item-source">中時新聞網</span>
+                    </div>
+                    <time>2026/06/22</time>
+                  </div>
+                  <h3>英相施凱爾請辭 工黨接班戰展開</h3>
+                  <p>施凱爾執政未滿兩年請辭，英國政壇再啟接班混戰。</p>
+                  <a href="https://www.chinatimes.com/realtimenews/20260622002844-260408" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="category-block" data-category-group="AI科技">
+              <div class="section-head">
+                <h2>AI科技</h2>
+                <span>8 則</span>
+              </div>
+              <div class="news-grid">
+                
+                <article class="news-item" data-category="AI科技" data-source="東森新聞網" data-title="聯發科通知客戶漲價 五大因素曝光">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">09</span>
+                      <span class="item-source">東森新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>聯發科通知客戶漲價 五大因素曝光</h3>
+                  <p>聯發科罕見發函漲價，原料物流與產能壓力全面升高。</p>
+                  <a href="https://news.ebc.net.tw/news/business/557795" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="AI科技" data-source="中時新聞網" data-title="甲骨文大裁員 2.1萬人丟飯碗">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">12</span>
+                      <span class="item-source">中時新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>甲骨文大裁員 2.1萬人丟飯碗</h3>
+                  <p>甲骨文縮編2.1萬人，科技業裁員潮再起。</p>
+                  <a href="https://www.chinatimes.com/realtimenews/20260623002207-260410" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="AI科技" data-source="Yahoo新聞" data-title="台積電先進封裝傳再評估二林設廠">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">19</span>
+                      <span class="item-source">Yahoo新聞</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>台積電先進封裝傳再評估二林設廠</h3>
+                  <p>AI需求推升封裝擴產，市場傳台積電再評估二林新廠。</p>
+                  <a href="https://tw.news.yahoo.com/%E5%8F%B0%E7%A9%8D%E9%9B%BB%E5%85%88%E9%80%B2%E5%B0%81%E8%A3%9D%E5%BB%A0%E5%85%A8%E5%8F%B0%E4%BA%94%E5%9C%B0%E9%96%8B%E8%8A%B1-%E5%82%B3%E8%A9%95%E4%BC%B0%E4%BA%8C%E6%9E%97%E5%9C%92%E5%8D%80%E5%86%8D%E8%A8%AD%E6%96%B0%E5%BB%A0-045454901.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="AI科技" data-source="TVBS新聞網" data-title="光寶科AI電源題材點火 目標價上看300">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">20</span>
+                      <span class="item-source">TVBS新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>光寶科AI電源題材點火 目標價上看300</h3>
+                  <p>AI伺服器電源需求升溫，法人上修光寶科目標價至300元。</p>
+                  <a href="https://news.tvbs.com.tw/money/3238059" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="AI科技" data-source="中時新聞網" data-title="佳能聯手Agility搶人形機器人商機">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">21</span>
+                      <span class="item-source">中時新聞網</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>佳能聯手Agility搶人形機器人商機</h3>
+                  <p>佳能攜Agility切入人形機器人視覺模組，瞄準AI新商機。</p>
+                  <a href="https://www.chinatimes.com/realtimenews/20260623002336-260410" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="AI科技" data-source="Yahoo新聞" data-title="Meta被爆蒐集鍵鼠數據訓練AI">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">24</span>
+                      <span class="item-source">Yahoo新聞</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>Meta被爆蒐集鍵鼠數據訓練AI</h3>
+                  <p>Meta內部AI訓練計畫疑監控員工操作，外洩後緊急喊停。</p>
+                  <a href="https://tw.news.yahoo.com/%E8%92%90%E9%9B%86%E9%8D%B5%E7%9B%A4%E6%BB%91%E9%BC%A0%E6%95%B8%E6%93%9A%E8%A8%93%E7%B7%B4ai-meta%E9%A9%9A%E7%88%86%E7%9B%A3%E6%8E%A7%E5%93%A1%E5%B7%A5%E7%B7%8A%E6%80%A5%E5%96%8A%E5%81%9C-040642751.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="AI科技" data-source="Yahoo新聞" data-title="AI對決畫家炎上 蔡阿嘎道歉">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">25</span>
+                      <span class="item-source">Yahoo新聞</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>AI對決畫家炎上 蔡阿嘎道歉</h3>
+                  <p>蔡阿嘎拿AI生成圖與街頭畫家比拚挨轟，發文致歉止血。</p>
+                  <a href="https://tw.news.yahoo.com/ai%E5%B0%8D%E6%B1%BA%E8%A1%97%E9%A0%AD%E7%95%AB%E5%AE%B6-%E9%81%AD%E7%82%8E%E4%B8%8A-%E8%94%A1%E9%98%BF%E5%98%8E%E9%81%93%E6%AD%89-ai%E7%84%A1%E6%B3%95%E5%8F%96%E4%BB%A3%E7%9C%9F%E4%BA%BA-003057484.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="AI科技" data-source="東森新聞網" data-title="功率半導體飆風起 搶接下一波AI賽道">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">29</span>
+                      <span class="item-source">東森新聞網</span>
+                    </div>
+                    <time>2026/06/22</time>
+                  </div>
+                  <h3>功率半導體飆風起 搶接下一波AI賽道</h3>
+                  <p>外資看好功率半導體下半年漲價，台韓供應鏈同步受惠。</p>
+                  <a href="https://news.ebc.net.tw/news/business/557723" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+              </div>
+            </section>
+            
+            <section class="category-block" data-category-group="電競遊戲">
+              <div class="section-head">
+                <h2>電競遊戲</h2>
+                <span>2 則</span>
+              </div>
+              <div class="news-grid">
+                
+                <article class="news-item" data-category="電競遊戲" data-source="Yahoo新聞" data-title="Valve全新Steam Machine今日開賣">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">23</span>
+                      <span class="item-source">Yahoo新聞</span>
+                    </div>
+                    <time>2026/06/23</time>
+                  </div>
+                  <h3>Valve全新Steam Machine今日開賣</h3>
+                  <p>Valve新主機在台開賣，兩版本定價3.7萬與4.8萬元起。</p>
+                  <a href="https://tw.news.yahoo.com/valve-%E5%85%A8%E6%96%B0%E9%9B%BB%E8%85%A6-steam-machine-%E4%BB%8A%E6%97%A5%E9%96%8B%E8%B3%A3-040000114.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+                <article class="news-item" data-category="電競遊戲" data-source="TVBS新聞網" data-title="遊戲股王鈊象配息36元 下半年更優">
+                  <div class="item-top">
+                    <div class="item-badges">
+                      <span class="item-index">26</span>
+                      <span class="item-source">TVBS新聞網</span>
+                    </div>
+                    <time>2026/06/22</time>
+                  </div>
+                  <h3>遊戲股王鈊象配息36元 下半年更優</h3>
+                  <p>鈊象前5月營收年增15%，董座看好下半年營運更強。</p>
+                  <a href="https://news.tvbs.com.tw/money/3237401" target="_blank" rel="noopener noreferrer">開啟原文</a>
+                </article>
+                
+              </div>
+            </section>
+            
+    </section>
+
+    <section class="table-panel">
+      <div class="panel-head">
+        <h2>完整清單</h2>
+        <span>想快速掃過全部標題時，可以看這個表格。</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>類別</th>
+              <th>來源</th>
+              <th>時間</th>
+              <th>標題</th>
+              <th>摘要</th>
+              <th>原文</th>
+            </tr>
+          </thead>
+          <tbody id="newsTableBody">
+            
+            <tr data-category="財經/證券" data-source="東森新聞網" data-title="台股衝上48K後翻黑！震盪近千點 台積刷天價">
+              <td class="cell-index">1</td>
+              <td>財經/證券</td>
+              <td>東森新聞網</td>
+              <td>06/23 13:42</td>
+              <td class="cell-title">台股衝上48K後翻黑！震盪近千點 台積刷天價</td>
+              <td>台股衝高後急殺近千點，台積電創高後帶動盤勢劇烈震盪。</td>
+              <td><a href="https://news.ebc.net.tw/news/business/557845" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="政治" data-source="中時新聞網" data-title="高雄市長民調 柯志恩46.8%領先賴瑞隆">
+              <td class="cell-index">2</td>
+              <td>政治</td>
+              <td>中時新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">高雄市長民調 柯志恩46.8%領先賴瑞隆</td>
+              <td>高雄選情升溫，新民調顯示柯志恩領先賴瑞隆4.8個百分點。</td>
+              <td><a href="https://www.chinatimes.com/realtimenews/20260623001900-260407" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="國際" data-source="TVBS新聞網" data-title="金正恩批日本軍事化 核武是唯一出路">
+              <td class="cell-index">3</td>
+              <td>國際</td>
+              <td>TVBS新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">金正恩批日本軍事化 核武是唯一出路</td>
+              <td>金正恩再批日本軍事化，並強調北韓核武路線不變。</td>
+              <td><a href="https://news.tvbs.com.tw/world/3238264" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="政治" data-source="TVBS新聞網" data-title="鄭麗文喊當造局者 2028布局受矚">
+              <td class="cell-index">4</td>
+              <td>政治</td>
+              <td>TVBS新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">鄭麗文喊當造局者 2028布局受矚</td>
+              <td>國民黨公布訪陸紀錄片，鄭麗文2028布局聯想升溫。</td>
+              <td><a href="https://news.tvbs.com.tw/politics/3238346" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="政治" data-source="Yahoo新聞" data-title="農業部：樂見兩岸貿易但不得私簽MOU">
+              <td class="cell-index">5</td>
+              <td>政治</td>
+              <td>Yahoo新聞</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">農業部：樂見兩岸貿易但不得私簽MOU</td>
+              <td>鳳梨釋迦輸陸爭議延燒，農業部強調貿易可行但須依法。</td>
+              <td><a href="https://tw.news.yahoo.com/%E8%BE%B2%E6%A5%AD%E9%83%A8%E9%95%B7%E9%99%B3%E9%A7%BF%E5%AD%A3%E8%A1%A8%E6%85%8B%E4%BA%86-%E6%A8%82%E8%A6%8B%E5%85%A9%E5%B2%B8%E8%B2%BF%E6%98%93%E4%BD%86%E4%B8%8D%E5%BE%97%E7%A7%81%E7%B0%BDmou-051435636.html" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="財經/證券" data-source="中時新聞網" data-title="融資餘額首破6000億引爆賣壓">
+              <td class="cell-index">6</td>
+              <td>財經/證券</td>
+              <td>中時新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">融資餘額首破6000億引爆賣壓</td>
+              <td>融資餘額刷新歷史高點，台股衝高後獲利了結賣壓湧出。</td>
+              <td><a href="https://www.chinatimes.com/realtimenews/20260623002154-260410" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="國際" data-source="東森新聞網" data-title="荷莫茲海峽航運復甦 24小時26船通過">
+              <td class="cell-index">7</td>
+              <td>國際</td>
+              <td>東森新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">荷莫茲海峽航運復甦 24小時26船通過</td>
+              <td>荷莫茲航運量略回升，24小時已有26艘船通過。</td>
+              <td><a href="https://news.ebc.net.tw/news/world/557830" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="國際" data-source="中時新聞網" data-title="荷姆茲海峽重啟 原油期貨走跌">
+              <td class="cell-index">8</td>
+              <td>國際</td>
+              <td>中時新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">荷姆茲海峽重啟 原油期貨走跌</td>
+              <td>市場押注航道恢復運輸，國際油價連續回落。</td>
+              <td><a href="https://www.chinatimes.com/realtimenews/20260623002567-260410" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="AI科技" data-source="東森新聞網" data-title="聯發科通知客戶漲價 五大因素曝光">
+              <td class="cell-index">9</td>
+              <td>AI科技</td>
+              <td>東森新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">聯發科通知客戶漲價 五大因素曝光</td>
+              <td>聯發科罕見發函漲價，原料物流與產能壓力全面升高。</td>
+              <td><a href="https://news.ebc.net.tw/news/business/557795" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="國際" data-source="Yahoo新聞" data-title="美允伊朗賣石油以美元結算">
+              <td class="cell-index">10</td>
+              <td>國際</td>
+              <td>Yahoo新聞</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">美允伊朗賣石油以美元結算</td>
+              <td>美國鬆綁對伊石油美元結算，換取核查與航運承諾。</td>
+              <td><a href="https://tw.news.yahoo.com/%E6%95%B8%E5%8D%81%E5%B9%B4%E4%BE%86%E6%9C%80%E9%87%8D%E5%A4%A7%E7%AA%81%E7%A0%B4-%E7%BE%8E%E5%9C%8B%E5%85%81%E4%BC%8A%E6%9C%97%E8%B3%A3%E7%9F%B3%E6%B2%B9%E4%BB%A5%E7%BE%8E%E5%85%83%E7%B5%90%E7%AE%97-044536031.html" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="國際" data-source="中時新聞網" data-title="美伊設荷莫茲熱線 伊朗拒買美農產">
+              <td class="cell-index">11</td>
+              <td>國際</td>
+              <td>中時新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">美伊設荷莫茲熱線 伊朗拒買美農產</td>
+              <td>美伊首輪談完浮現分歧，伊朗稱無義務加碼買美農產品。</td>
+              <td><a href="https://www.chinatimes.com/realtimenews/20260623001681-260408" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="AI科技" data-source="中時新聞網" data-title="甲骨文大裁員 2.1萬人丟飯碗">
+              <td class="cell-index">12</td>
+              <td>AI科技</td>
+              <td>中時新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">甲骨文大裁員 2.1萬人丟飯碗</td>
+              <td>甲骨文縮編2.1萬人，科技業裁員潮再起。</td>
+              <td><a href="https://www.chinatimes.com/realtimenews/20260623002207-260410" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="國際" data-source="TVBS新聞網" data-title="歐洲熱浪肆虐 法西飆破40度">
+              <td class="cell-index">13</td>
+              <td>國際</td>
+              <td>TVBS新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">歐洲熱浪肆虐 法西飆破40度</td>
+              <td>歐洲多國高溫破40度，法國、西班牙發布紅色警報。</td>
+              <td><a href="https://news.tvbs.com.tw/world/3238156" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="財經/證券" data-source="Yahoo新聞" data-title="日圓逼近40年新低 官方表態將干預支撐匯率">
+              <td class="cell-index">14</td>
+              <td>財經/證券</td>
+              <td>Yahoo新聞</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">日圓逼近40年新低 官方表態將干預支撐匯率</td>
+              <td>日圓續貶逼近40年低點，日本與美國準備出手穩匯。</td>
+              <td><a href="https://tw.news.yahoo.com/%E6%97%A5%E5%9C%93%E9%80%BC%E8%BF%9140%E5%B9%B4%E6%96%B0%E4%BD%8E-%E5%AE%98%E6%96%B9%E8%A1%A8%E6%85%8B%E5%B0%87%E5%B9%B2%E9%A0%90%E6%94%AF%E6%92%90%E5%8C%AF%E7%8E%87-052946957.html" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="財經/證券" data-source="TVBS新聞網" data-title="日圓歷史性走貶 美日財長緊急會議">
+              <td class="cell-index">15</td>
+              <td>財經/證券</td>
+              <td>TVBS新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">日圓歷史性走貶 美日財長緊急會議</td>
+              <td>日圓貶破161，美日財長緊急開會商議匯率穩定方案。</td>
+              <td><a href="https://news.tvbs.com.tw/world/3238053" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="政治" data-source="TVBS新聞網" data-title="新竹空軍基地爆炸聲 起火原因曝光">
+              <td class="cell-index">16</td>
+              <td>政治</td>
+              <td>TVBS新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">新竹空軍基地爆炸聲 起火原因曝光</td>
+              <td>新竹油料分庫清洗作業氣爆，1名工人受傷送醫。</td>
+              <td><a href="https://news.tvbs.com.tw/politics/3238137" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="政治" data-source="Yahoo新聞" data-title="打造無人機非紅供應鏈 民進黨籲速通過2100億預算">
+              <td class="cell-index">17</td>
+              <td>政治</td>
+              <td>Yahoo新聞</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">打造無人機非紅供應鏈 民進黨籲速通過2100億預算</td>
+              <td>綠營催過無人機預算，拚國防自主、產業升級與台美合作。</td>
+              <td><a href="https://tw.news.yahoo.com/%E6%89%93%E9%80%A0%E7%84%A1%E4%BA%BA%E6%A9%9F-%E9%9D%9E%E7%B4%85%E4%BE%9B%E6%87%89%E9%8F%88-%E6%B0%91%E9%80%B2%E9%BB%A8%E7%B1%B2%E5%84%98%E9%80%9F%E9%80%9A%E9%81%8E2100%E5%84%84%E9%A0%90%E7%AE%97-051420821.html" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="財經/證券" data-source="中時新聞網" data-title="台股創高後狂震千點 收盤跌640點">
+              <td class="cell-index">18</td>
+              <td>財經/證券</td>
+              <td>中時新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">台股創高後狂震千點 收盤跌640點</td>
+              <td>台股早盤創高後翻黑重挫，終場跌640點、成交量放大。</td>
+              <td><a href="https://www.chinatimes.com/realtimenews/20260623002530-260410" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="AI科技" data-source="Yahoo新聞" data-title="台積電先進封裝傳再評估二林設廠">
+              <td class="cell-index">19</td>
+              <td>AI科技</td>
+              <td>Yahoo新聞</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">台積電先進封裝傳再評估二林設廠</td>
+              <td>AI需求推升封裝擴產，市場傳台積電再評估二林新廠。</td>
+              <td><a href="https://tw.news.yahoo.com/%E5%8F%B0%E7%A9%8D%E9%9B%BB%E5%85%88%E9%80%B2%E5%B0%81%E8%A3%9D%E5%BB%A0%E5%85%A8%E5%8F%B0%E4%BA%94%E5%9C%B0%E9%96%8B%E8%8A%B1-%E5%82%B3%E8%A9%95%E4%BC%B0%E4%BA%8C%E6%9E%97%E5%9C%92%E5%8D%80%E5%86%8D%E8%A8%AD%E6%96%B0%E5%BB%A0-045454901.html" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="AI科技" data-source="TVBS新聞網" data-title="光寶科AI電源題材點火 目標價上看300">
+              <td class="cell-index">20</td>
+              <td>AI科技</td>
+              <td>TVBS新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">光寶科AI電源題材點火 目標價上看300</td>
+              <td>AI伺服器電源需求升溫，法人上修光寶科目標價至300元。</td>
+              <td><a href="https://news.tvbs.com.tw/money/3238059" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="AI科技" data-source="中時新聞網" data-title="佳能聯手Agility搶人形機器人商機">
+              <td class="cell-index">21</td>
+              <td>AI科技</td>
+              <td>中時新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">佳能聯手Agility搶人形機器人商機</td>
+              <td>佳能攜Agility切入人形機器人視覺模組，瞄準AI新商機。</td>
+              <td><a href="https://www.chinatimes.com/realtimenews/20260623002336-260410" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="國際" data-source="TVBS新聞網" data-title="伊朗擬設荷姆茲熱線 航道改由德黑蘭管">
+              <td class="cell-index">22</td>
+              <td>國際</td>
+              <td>TVBS新聞網</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">伊朗擬設荷姆茲熱線 航道改由德黑蘭管</td>
+              <td>伊朗同意設熱線處理船舶通行，海峽管理主導權升高。</td>
+              <td><a href="https://news.tvbs.com.tw/world/3238177" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="電競遊戲" data-source="Yahoo新聞" data-title="Valve全新Steam Machine今日開賣">
+              <td class="cell-index">23</td>
+              <td>電競遊戲</td>
+              <td>Yahoo新聞</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">Valve全新Steam Machine今日開賣</td>
+              <td>Valve新主機在台開賣，兩版本定價3.7萬與4.8萬元起。</td>
+              <td><a href="https://tw.news.yahoo.com/valve-%E5%85%A8%E6%96%B0%E9%9B%BB%E8%85%A6-steam-machine-%E4%BB%8A%E6%97%A5%E9%96%8B%E8%B3%A3-040000114.html" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="AI科技" data-source="Yahoo新聞" data-title="Meta被爆蒐集鍵鼠數據訓練AI">
+              <td class="cell-index">24</td>
+              <td>AI科技</td>
+              <td>Yahoo新聞</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">Meta被爆蒐集鍵鼠數據訓練AI</td>
+              <td>Meta內部AI訓練計畫疑監控員工操作，外洩後緊急喊停。</td>
+              <td><a href="https://tw.news.yahoo.com/%E8%92%90%E9%9B%86%E9%8D%B5%E7%9B%A4%E6%BB%91%E9%BC%A0%E6%95%B8%E6%93%9A%E8%A8%93%E7%B7%B4ai-meta%E9%A9%9A%E7%88%86%E7%9B%A3%E6%8E%A7%E5%93%A1%E5%B7%A5%E7%B7%8A%E6%80%A5%E5%96%8A%E5%81%9C-040642751.html" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="AI科技" data-source="Yahoo新聞" data-title="AI對決畫家炎上 蔡阿嘎道歉">
+              <td class="cell-index">25</td>
+              <td>AI科技</td>
+              <td>Yahoo新聞</td>
+              <td>2026/06/23</td>
+              <td class="cell-title">AI對決畫家炎上 蔡阿嘎道歉</td>
+              <td>蔡阿嘎拿AI生成圖與街頭畫家比拚挨轟，發文致歉止血。</td>
+              <td><a href="https://tw.news.yahoo.com/ai%E5%B0%8D%E6%B1%BA%E8%A1%97%E9%A0%AD%E7%95%AB%E5%AE%B6-%E9%81%AD%E7%82%8E%E4%B8%8A-%E8%94%A1%E9%98%BF%E5%98%8E%E9%81%93%E6%AD%89-ai%E7%84%A1%E6%B3%95%E5%8F%96%E4%BB%A3%E7%9C%9F%E4%BA%BA-003057484.html" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="電競遊戲" data-source="TVBS新聞網" data-title="遊戲股王鈊象配息36元 下半年更優">
+              <td class="cell-index">26</td>
+              <td>電競遊戲</td>
+              <td>TVBS新聞網</td>
+              <td>2026/06/22</td>
+              <td class="cell-title">遊戲股王鈊象配息36元 下半年更優</td>
+              <td>鈊象前5月營收年增15%，董座看好下半年營運更強。</td>
+              <td><a href="https://news.tvbs.com.tw/money/3237401" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="政治" data-source="東森新聞網" data-title="資安院內鬼入侵 院長林盈達請辭">
+              <td class="cell-index">27</td>
+              <td>政治</td>
+              <td>東森新聞網</td>
+              <td>2026/06/22</td>
+              <td class="cell-title">資安院內鬼入侵 院長林盈達請辭</td>
+              <td>院內員工涉駭公文系統，資安院長請辭扛責。</td>
+              <td><a href="https://news.ebc.net.tw/news/politics/557768" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="國際" data-source="中時新聞網" data-title="英相施凱爾請辭 工黨接班戰展開">
+              <td class="cell-index">28</td>
+              <td>國際</td>
+              <td>中時新聞網</td>
+              <td>2026/06/22</td>
+              <td class="cell-title">英相施凱爾請辭 工黨接班戰展開</td>
+              <td>施凱爾執政未滿兩年請辭，英國政壇再啟接班混戰。</td>
+              <td><a href="https://www.chinatimes.com/realtimenews/20260622002844-260408" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="AI科技" data-source="東森新聞網" data-title="功率半導體飆風起 搶接下一波AI賽道">
+              <td class="cell-index">29</td>
+              <td>AI科技</td>
+              <td>東森新聞網</td>
+              <td>2026/06/22</td>
+              <td class="cell-title">功率半導體飆風起 搶接下一波AI賽道</td>
+              <td>外資看好功率半導體下半年漲價，台韓供應鏈同步受惠。</td>
+              <td><a href="https://news.ebc.net.tw/news/business/557723" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+            <tr data-category="政治" data-source="東森新聞網" data-title="14天教召全面上路 取消1次抵2次">
+              <td class="cell-index">30</td>
+              <td>政治</td>
+              <td>東森新聞網</td>
+              <td>2026/06/22</td>
+              <td class="cell-title">14天教召全面上路 取消1次抵2次</td>
+              <td>今年起教召統一14天，取消舊制折抵優惠並強化實戰編組。</td>
+              <td><a href="https://news.ebc.net.tw/news/politics/557760" target="_blank" rel="noopener noreferrer">原文</a></td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="footer-note">這是本機 HTML 檔，直接雙擊就能在瀏覽器開啟；之後每次排程都會覆蓋同一份檔案。</p>
+  </main>
+
+  <script id="newsData" type="application/json">[{&quot;source&quot;: &quot;東森新聞網&quot;, &quot;category&quot;: &quot;財經/證券&quot;, &quot;time&quot;: &quot;06/23 13:42&quot;, &quot;title&quot;: &quot;台股衝上48K後翻黑！震盪近千點 台積刷天價&quot;, &quot;summary&quot;: &quot;台股衝高後急殺近千點，台積電創高後帶動盤勢劇烈震盪。&quot;, &quot;url&quot;: &quot;https://news.ebc.net.tw/news/business/557845&quot;, &quot;id&quot;: 1}, {&quot;category&quot;: &quot;政治&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;高雄市長民調 柯志恩46.8%領先賴瑞隆&quot;, &quot;summary&quot;: &quot;高雄選情升溫，新民調顯示柯志恩領先賴瑞隆4.8個百分點。&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260623001900-260407&quot;, &quot;id&quot;: 2}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;金正恩批日本軍事化 核武是唯一出路&quot;, &quot;summary&quot;: &quot;金正恩再批日本軍事化，並強調北韓核武路線不變。&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/world/3238264&quot;, &quot;id&quot;: 3}, {&quot;category&quot;: &quot;政治&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;鄭麗文喊當造局者 2028布局受矚&quot;, &quot;summary&quot;: &quot;國民黨公布訪陸紀錄片，鄭麗文2028布局聯想升溫。&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/politics/3238346&quot;, &quot;id&quot;: 4}, {&quot;category&quot;: &quot;政治&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;農業部：樂見兩岸貿易但不得私簽MOU&quot;, &quot;summary&quot;: &quot;鳳梨釋迦輸陸爭議延燒，農業部強調貿易可行但須依法。&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/%E8%BE%B2%E6%A5%AD%E9%83%A8%E9%95%B7%E9%99%B3%E9%A7%BF%E5%AD%A3%E8%A1%A8%E6%85%8B%E4%BA%86-%E6%A8%82%E8%A6%8B%E5%85%A9%E5%B2%B8%E8%B2%BF%E6%98%93%E4%BD%86%E4%B8%8D%E5%BE%97%E7%A7%81%E7%B0%BDmou-051435636.html&quot;, &quot;id&quot;: 5}, {&quot;category&quot;: &quot;財經/證券&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;融資餘額首破6000億引爆賣壓&quot;, &quot;summary&quot;: &quot;融資餘額刷新歷史高點，台股衝高後獲利了結賣壓湧出。&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260623002154-260410&quot;, &quot;id&quot;: 6}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;東森新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;荷莫茲海峽航運復甦 24小時26船通過&quot;, &quot;summary&quot;: &quot;荷莫茲航運量略回升，24小時已有26艘船通過。&quot;, &quot;url&quot;: &quot;https://news.ebc.net.tw/news/world/557830&quot;, &quot;id&quot;: 7}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;荷姆茲海峽重啟 原油期貨走跌&quot;, &quot;summary&quot;: &quot;市場押注航道恢復運輸，國際油價連續回落。&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260623002567-260410&quot;, &quot;id&quot;: 8}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;東森新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;聯發科通知客戶漲價 五大因素曝光&quot;, &quot;summary&quot;: &quot;聯發科罕見發函漲價，原料物流與產能壓力全面升高。&quot;, &quot;url&quot;: &quot;https://news.ebc.net.tw/news/business/557795&quot;, &quot;id&quot;: 9}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;美允伊朗賣石油以美元結算&quot;, &quot;summary&quot;: &quot;美國鬆綁對伊石油美元結算，換取核查與航運承諾。&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/%E6%95%B8%E5%8D%81%E5%B9%B4%E4%BE%86%E6%9C%80%E9%87%8D%E5%A4%A7%E7%AA%81%E7%A0%B4-%E7%BE%8E%E5%9C%8B%E5%85%81%E4%BC%8A%E6%9C%97%E8%B3%A3%E7%9F%B3%E6%B2%B9%E4%BB%A5%E7%BE%8E%E5%85%83%E7%B5%90%E7%AE%97-044536031.html&quot;, &quot;id&quot;: 10}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;美伊設荷莫茲熱線 伊朗拒買美農產&quot;, &quot;summary&quot;: &quot;美伊首輪談完浮現分歧，伊朗稱無義務加碼買美農產品。&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260623001681-260408&quot;, &quot;id&quot;: 11}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;甲骨文大裁員 2.1萬人丟飯碗&quot;, &quot;summary&quot;: &quot;甲骨文縮編2.1萬人，科技業裁員潮再起。&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260623002207-260410&quot;, &quot;id&quot;: 12}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;歐洲熱浪肆虐 法西飆破40度&quot;, &quot;summary&quot;: &quot;歐洲多國高溫破40度，法國、西班牙發布紅色警報。&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/world/3238156&quot;, &quot;id&quot;: 13}, {&quot;category&quot;: &quot;財經/證券&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;日圓逼近40年新低 官方表態將干預支撐匯率&quot;, &quot;summary&quot;: &quot;日圓續貶逼近40年低點，日本與美國準備出手穩匯。&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/%E6%97%A5%E5%9C%93%E9%80%BC%E8%BF%9140%E5%B9%B4%E6%96%B0%E4%BD%8E-%E5%AE%98%E6%96%B9%E8%A1%A8%E6%85%8B%E5%B0%87%E5%B9%B2%E9%A0%90%E6%94%AF%E6%92%90%E5%8C%AF%E7%8E%87-052946957.html&quot;, &quot;id&quot;: 14}, {&quot;category&quot;: &quot;財經/證券&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;日圓歷史性走貶 美日財長緊急會議&quot;, &quot;summary&quot;: &quot;日圓貶破161，美日財長緊急開會商議匯率穩定方案。&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/world/3238053&quot;, &quot;id&quot;: 15}, {&quot;category&quot;: &quot;政治&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;新竹空軍基地爆炸聲 起火原因曝光&quot;, &quot;summary&quot;: &quot;新竹油料分庫清洗作業氣爆，1名工人受傷送醫。&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/politics/3238137&quot;, &quot;id&quot;: 16}, {&quot;category&quot;: &quot;政治&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;打造無人機非紅供應鏈 民進黨籲速通過2100億預算&quot;, &quot;summary&quot;: &quot;綠營催過無人機預算，拚國防自主、產業升級與台美合作。&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/%E6%89%93%E9%80%A0%E7%84%A1%E4%BA%BA%E6%A9%9F-%E9%9D%9E%E7%B4%85%E4%BE%9B%E6%87%89%E9%8F%88-%E6%B0%91%E9%80%B2%E9%BB%A8%E7%B1%B2%E5%84%98%E9%80%9F%E9%80%9A%E9%81%8E2100%E5%84%84%E9%A0%90%E7%AE%97-051420821.html&quot;, &quot;id&quot;: 17}, {&quot;category&quot;: &quot;財經/證券&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;台股創高後狂震千點 收盤跌640點&quot;, &quot;summary&quot;: &quot;台股早盤創高後翻黑重挫，終場跌640點、成交量放大。&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260623002530-260410&quot;, &quot;id&quot;: 18}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;台積電先進封裝傳再評估二林設廠&quot;, &quot;summary&quot;: &quot;AI需求推升封裝擴產，市場傳台積電再評估二林新廠。&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/%E5%8F%B0%E7%A9%8D%E9%9B%BB%E5%85%88%E9%80%B2%E5%B0%81%E8%A3%9D%E5%BB%A0%E5%85%A8%E5%8F%B0%E4%BA%94%E5%9C%B0%E9%96%8B%E8%8A%B1-%E5%82%B3%E8%A9%95%E4%BC%B0%E4%BA%8C%E6%9E%97%E5%9C%92%E5%8D%80%E5%86%8D%E8%A8%AD%E6%96%B0%E5%BB%A0-045454901.html&quot;, &quot;id&quot;: 19}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;光寶科AI電源題材點火 目標價上看300&quot;, &quot;summary&quot;: &quot;AI伺服器電源需求升溫，法人上修光寶科目標價至300元。&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/money/3238059&quot;, &quot;id&quot;: 20}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;佳能聯手Agility搶人形機器人商機&quot;, &quot;summary&quot;: &quot;佳能攜Agility切入人形機器人視覺模組，瞄準AI新商機。&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260623002336-260410&quot;, &quot;id&quot;: 21}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;伊朗擬設荷姆茲熱線 航道改由德黑蘭管&quot;, &quot;summary&quot;: &quot;伊朗同意設熱線處理船舶通行，海峽管理主導權升高。&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/world/3238177&quot;, &quot;id&quot;: 22}, {&quot;category&quot;: &quot;電競遊戲&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;Valve全新Steam Machine今日開賣&quot;, &quot;summary&quot;: &quot;Valve新主機在台開賣，兩版本定價3.7萬與4.8萬元起。&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/valve-%E5%85%A8%E6%96%B0%E9%9B%BB%E8%85%A6-steam-machine-%E4%BB%8A%E6%97%A5%E9%96%8B%E8%B3%A3-040000114.html&quot;, &quot;id&quot;: 23}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;Meta被爆蒐集鍵鼠數據訓練AI&quot;, &quot;summary&quot;: &quot;Meta內部AI訓練計畫疑監控員工操作，外洩後緊急喊停。&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/%E8%92%90%E9%9B%86%E9%8D%B5%E7%9B%A4%E6%BB%91%E9%BC%A0%E6%95%B8%E6%93%9A%E8%A8%93%E7%B7%B4ai-meta%E9%A9%9A%E7%88%86%E7%9B%A3%E6%8E%A7%E5%93%A1%E5%B7%A5%E7%B7%8A%E6%80%A5%E5%96%8A%E5%81%9C-040642751.html&quot;, &quot;id&quot;: 24}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;2026/06/23&quot;, &quot;title&quot;: &quot;AI對決畫家炎上 蔡阿嘎道歉&quot;, &quot;summary&quot;: &quot;蔡阿嘎拿AI生成圖與街頭畫家比拚挨轟，發文致歉止血。&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/ai%E5%B0%8D%E6%B1%BA%E8%A1%97%E9%A0%AD%E7%95%AB%E5%AE%B6-%E9%81%AD%E7%82%8E%E4%B8%8A-%E8%94%A1%E9%98%BF%E5%98%8E%E9%81%93%E6%AD%89-ai%E7%84%A1%E6%B3%95%E5%8F%96%E4%BB%A3%E7%9C%9F%E4%BA%BA-003057484.html&quot;, &quot;id&quot;: 25}, {&quot;category&quot;: &quot;電競遊戲&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;2026/06/22&quot;, &quot;title&quot;: &quot;遊戲股王鈊象配息36元 下半年更優&quot;, &quot;summary&quot;: &quot;鈊象前5月營收年增15%，董座看好下半年營運更強。&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/money/3237401&quot;, &quot;id&quot;: 26}, {&quot;category&quot;: &quot;政治&quot;, &quot;source&quot;: &quot;東森新聞網&quot;, &quot;time&quot;: &quot;2026/06/22&quot;, &quot;title&quot;: &quot;資安院內鬼入侵 院長林盈達請辭&quot;, &quot;summary&quot;: &quot;院內員工涉駭公文系統，資安院長請辭扛責。&quot;, &quot;url&quot;: &quot;https://news.ebc.net.tw/news/politics/557768&quot;, &quot;id&quot;: 27}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;2026/06/22&quot;, &quot;title&quot;: &quot;英相施凱爾請辭 工黨接班戰展開&quot;, &quot;summary&quot;: &quot;施凱爾執政未滿兩年請辭，英國政壇再啟接班混戰。&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260622002844-260408&quot;, &quot;id&quot;: 28}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;東森新聞網&quot;, &quot;time&quot;: &quot;2026/06/22&quot;, &quot;title&quot;: &quot;功率半導體飆風起 搶接下一波AI賽道&quot;, &quot;summary&quot;: &quot;外資看好功率半導體下半年漲價，台韓供應鏈同步受惠。&quot;, &quot;url&quot;: &quot;https://news.ebc.net.tw/news/business/557723&quot;, &quot;id&quot;: 29}, {&quot;category&quot;: &quot;政治&quot;, &quot;source&quot;: &quot;東森新聞網&quot;, &quot;time&quot;: &quot;2026/06/22&quot;, &quot;title&quot;: &quot;14天教召全面上路 取消1次抵2次&quot;, &quot;summary&quot;: &quot;今年起教召統一14天，取消舊制折抵優惠並強化實戰編組。&quot;, &quot;url&quot;: &quot;https://news.ebc.net.tw/news/politics/557760&quot;, &quot;id&quot;: 30}]</script>
+  <script>
+    const state = { keyword: "", category: "全部" };
+    const filterRow = document.getElementById("filterRow");
+    const searchInput = document.getElementById("searchInput");
+    const tableRows = Array.from(document.querySelectorAll("#newsTableBody tr"));
+    const cards = Array.from(document.querySelectorAll(".news-item"));
+    const leadCards = Array.from(document.querySelectorAll(".lead-card"));
+    const groups = Array.from(document.querySelectorAll("[data-category-group]"));
+    const emptyState = document.getElementById("emptyState");
+
+    function textMatch(node, keyword) {
+      if (!keyword) return true;
+      return node.textContent.toLowerCase().includes(keyword);
+    }
+
+    function categoryMatch(category) {
+      return state.category === "全部" || category === state.category;
+    }
+
+    function applyFilters() {
+      const keyword = state.keyword.trim().toLowerCase();
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const ok = categoryMatch(card.dataset.category) && textMatch(card, keyword);
+        card.classList.toggle("hidden", !ok);
+        if (ok) visibleCount += 1;
+      });
+
+      groups.forEach((group) => {
+        const category = group.dataset.categoryGroup;
+        const hasVisible = Array.from(group.querySelectorAll(".news-item")).some((card) => !card.classList.contains("hidden"));
+        group.classList.toggle("hidden", !categoryMatch(category) || !hasVisible);
+      });
+
+      tableRows.forEach((row) => {
+        const ok = categoryMatch(row.dataset.category) && textMatch(row, keyword);
+        row.classList.toggle("hidden", !ok);
+      });
+
+      leadCards.forEach((card) => {
+        const ok = categoryMatch(card.dataset.category) && textMatch(card, keyword);
+        card.classList.toggle("hidden", !ok);
+      });
+
+      emptyState.style.display = visibleCount === 0 ? "block" : "none";
+    }
+
+    filterRow.addEventListener("click", (event) => {
+      const button = event.target.closest(".filter-chip");
+      if (!button) return;
+      state.category = button.dataset.filter;
+      document.querySelectorAll(".filter-chip").forEach((chip) => chip.classList.remove("is-active"));
+      button.classList.add("is-active");
+      applyFilters();
+    });
+
+    searchInput.addEventListener("input", () => {
+      state.keyword = searchInput.value;
+      applyFilters();
+    });
+  </script>
+</body>
+</html>
