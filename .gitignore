@@ -13,3 +13,4 @@ create_daily_news_doc_*.py
 create_daily_news_html_20260623.py
 新聞提示詞/
 每日新聞核心話題_近24小時_*.html
+automation_update_log.txt
