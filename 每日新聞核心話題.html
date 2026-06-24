@@ -5,1315 +5,142 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>每日新聞核心話題 即時版</title>
   <style>
-    :root {
-      color-scheme: light;
-      --bg: #eef3f8;
-      --surface: #ffffff;
-      --surface-2: #f7fafe;
-      --line: #d7e0eb;
-      --text: #122033;
-      --muted: #617286;
-      --accent: #0b57d0;
-      --accent-2: #08306b;
-      --accent-soft: #e9f1ff;
-      --shadow: 0 10px 28px rgba(15, 35, 55, 0.08);
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
-    a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 700;
-    }
-    a:hover { text-decoration: underline; }
-    .page {
-      width: min(1360px, calc(100% - 28px));
-      margin: 18px auto 34px;
-    }
-    .hero {
-      background: linear-gradient(135deg, #0a2342, #154c79 68%, #1c7293);
-      color: #fff;
-      border-radius: 8px;
-      padding: 28px;
-      box-shadow: var(--shadow);
-    }
-    .hero-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      align-items: flex-start;
-      margin-bottom: 20px;
-    }
-    .hero h1 {
-      margin: 0 0 10px;
-      font-size: 32px;
-      line-height: 1.2;
-    }
-    .hero p {
-      margin: 6px 0;
-      color: rgba(255,255,255,0.9);
-      font-size: 14px;
-    }
-    .hero-side {
-      min-width: 240px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 8px;
-      padding: 14px 16px;
-    }
-    .hero-side strong {
-      display: block;
-      font-size: 12px;
-      opacity: 0.8;
-      margin-bottom: 6px;
-    }
-    .hero-side span {
-      display: block;
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-    .hero-side small {
-      display: block;
-      font-size: 12px;
-      color: rgba(255,255,255,0.86);
-    }
-    .toolbar {
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-      gap: 14px;
-      margin-top: 18px;
-    }
-    .toolbar-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      padding: 14px 16px;
-    }
-    .toolbar-label {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 10px;
-    }
-    .search-input {
-      width: 100%;
-      height: 42px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      padding: 0 14px;
-      font-size: 15px;
-      outline: none;
-      background: #fff;
-    }
-    .search-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.12);
-    }
-    .filter-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .filter-chip {
-      border: 1px solid var(--line);
-      background: #fff;
-      color: var(--text);
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 13px;
-      cursor: pointer;
-    }
-    .filter-chip span {
-      color: var(--muted);
-      margin-left: 4px;
-    }
-    .filter-chip.is-active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-    }
-    .filter-chip.is-active span {
-      color: rgba(255,255,255,0.88);
-    }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-      margin: 18px 0;
-    }
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      padding: 16px;
-    }
-    .stat-card-wide {
-      grid-column: span 2;
-    }
-    .stat-label {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 10px;
-    }
-    .stat-value {
-      font-size: 32px;
-      font-weight: 800;
-      color: var(--accent-2);
-    }
-    .stat-value-small {
-      font-size: 22px;
-    }
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 11px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent-2);
-      font-size: 13px;
-    }
-    .chip em {
-      color: var(--muted);
-      font-style: normal;
-    }
-    .lead-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-    .lead-card, .category-block, .table-panel {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-    }
-    .lead-card {
-      padding: 16px;
-      min-height: 220px;
-      display: flex;
-      flex-direction: column;
-    }
-    .lead-meta, .item-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 28px;
-      height: 28px;
-      padding: 0 10px;
-      border-radius: 999px;
-      background: var(--accent);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .badge-soft {
-      background: var(--accent-soft);
-      color: var(--accent-2);
-    }
-    .lead-card h2 {
-      margin: 14px 0 10px;
-      font-size: 20px;
-      line-height: 1.35;
-    }
-    .lead-card p {
-      margin: 0;
-      color: #36495f;
-      font-size: 14px;
-    }
-    .lead-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-top: auto;
-      padding-top: 14px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .category-stack {
-      display: grid;
-      gap: 16px;
-    }
-    .category-block {
-      padding: 16px;
-    }
-    .section-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-    .section-head h2 {
-      margin: 0;
-      font-size: 22px;
-    }
-    .section-head span {
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .news-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-    .news-item {
-      background: var(--surface-2);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 14px;
-    }
-    .item-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .item-index {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 34px;
-      height: 28px;
-      border-radius: 999px;
-      background: #dce9ff;
-      color: var(--accent-2);
-      font-size: 12px;
-      font-weight: 800;
-    }
-    .item-source {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 700;
-    }
-    .item-top time {
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .news-item h3 {
-      margin: 0 0 8px;
-      font-size: 18px;
-      line-height: 1.35;
-    }
-    .news-item p {
-      margin: 0 0 10px;
-      color: #3b4d61;
-      font-size: 14px;
-    }
-    .table-panel {
-      margin-top: 18px;
-      overflow: hidden;
-    }
-    .panel-head {
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      border-bottom: 1px solid var(--line);
-    }
-    .panel-head h2 {
-      margin: 0;
-      font-size: 20px;
-    }
-    .panel-head span {
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .table-wrap {
-      overflow-x: auto;
-    }
-    table {
-      width: 100%;
-      min-width: 1050px;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding: 12px 10px;
-      border-bottom: 1px solid var(--line);
-      text-align: left;
-      vertical-align: top;
-      font-size: 14px;
-    }
-    th {
-      position: sticky;
-      top: 0;
-      background: #edf4ff;
-      color: #15385a;
-      z-index: 1;
-    }
-    .cell-index {
-      width: 60px;
-      text-align: center;
-      font-weight: 800;
-      color: var(--accent);
-    }
-    .cell-title {
-      min-width: 320px;
-      font-weight: 700;
-    }
-    .empty-state {
-      display: none;
-      background: #fff7f6;
-      border: 1px solid #f3d2cf;
-      color: #7a2620;
-      border-radius: 8px;
-      padding: 14px 16px;
-      margin: 18px 0 0;
-    }
-    .footer-note {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 14px;
-      text-align: center;
-    }
-    .hidden {
-      display: none !important;
-    }
-    @media (max-width: 1180px) {
-      .lead-grid, .news-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-      .stats-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-    @media (max-width: 860px) {
-      .page {
-        width: min(100% - 18px, 100%);
-        margin: 10px auto 24px;
-      }
-      .hero {
-        padding: 18px;
-      }
-      .hero-top, .toolbar {
-        grid-template-columns: 1fr;
-        display: grid;
-      }
-      .hero h1 {
-        font-size: 26px;
-      }
-      .lead-grid, .news-grid, .stats-grid {
-        grid-template-columns: 1fr;
-      }
-      .stat-card-wide {
-        grid-column: auto;
-      }
-      .panel-head {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-    }
+    :root { color-scheme: light; --bg:#eef3f8; --surface:#fff; --surface-2:#f7fafe; --line:#d7e0eb; --text:#122033; --muted:#617286; --accent:#0b57d0; --accent-2:#08306b; --accent-soft:#e9f1ff; --shadow:0 10px 28px rgba(15,35,55,.08); }
+    * { box-sizing:border-box; } body { margin:0; font-family:"Microsoft JhengHei","Noto Sans TC",Arial,sans-serif; background:var(--bg); color:var(--text); line-height:1.5; } a { color:var(--accent); text-decoration:none; font-weight:700; } a:hover { text-decoration:underline; }
+    .page { width:min(1360px,calc(100% - 28px)); margin:18px auto 34px; } .hero { background:linear-gradient(135deg,#0a2342,#154c79 68%,#1c7293); color:#fff; border-radius:8px; padding:28px; box-shadow:var(--shadow); }
+    .hero-top { display:flex; justify-content:space-between; gap:20px; align-items:flex-start; margin-bottom:20px; } .hero h1 { margin:0 0 10px; font-size:32px; line-height:1.2; } .hero p { margin:6px 0; color:rgba(255,255,255,.9); font-size:14px; }
+    .hero-side { min-width:240px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.12); border-radius:8px; padding:14px 16px; } .hero-side strong { display:block; font-size:12px; opacity:.8; margin-bottom:6px; } .hero-side span { display:block; font-size:20px; font-weight:700; margin-bottom:10px; }
+    .toolbar { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); gap:14px; margin-top:18px; } .toolbar-card,.stat-card,.lead-card,.category-block,.table-panel { background:var(--surface); border:1px solid var(--line); border-radius:8px; box-shadow:var(--shadow); }
+    .toolbar-card { padding:14px 16px; } .toolbar-label,.stat-label { color:var(--muted); font-size:13px; margin-bottom:10px; } .search-input { width:100%; height:42px; border-radius:8px; border:1px solid var(--line); padding:0 14px; font-size:15px; }
+    .filter-row,.chips,.lead-meta,.item-badges { display:flex; flex-wrap:wrap; gap:8px; align-items:center; } .filter-chip { border:1px solid var(--line); background:#fff; color:var(--text); border-radius:999px; padding:8px 12px; font-size:13px; cursor:pointer; } .filter-chip.is-active { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .stats-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin:18px 0; } .stat-card { padding:16px; } .stat-card-wide { grid-column:span 2; } .stat-value { font-size:32px; font-weight:800; color:var(--accent-2); } .stat-value-small { font-size:22px; }
+    .chip,.badge,.item-index { display:inline-flex; align-items:center; justify-content:center; border-radius:999px; } .chip { gap:8px; padding:7px 11px; background:var(--accent-soft); color:var(--accent-2); font-size:13px; } .chip em { color:var(--muted); font-style:normal; }
+    .lead-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:18px; } .lead-card { padding:16px; min-height:220px; display:flex; flex-direction:column; } .badge { min-width:28px; height:28px; padding:0 10px; background:var(--accent); color:#fff; font-size:12px; font-weight:700; } .badge-soft { background:var(--accent-soft); color:var(--accent-2); }
+    .lead-card h2 { margin:14px 0 10px; font-size:20px; line-height:1.35; } .lead-card p,.news-item p { margin:0; color:#36495f; font-size:14px; } .lead-footer { display:flex; justify-content:space-between; gap:10px; margin-top:auto; padding-top:14px; color:var(--muted); font-size:13px; }
+    .category-stack { display:grid; gap:16px; } .category-block { padding:16px; } .section-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px; } .section-head h2 { margin:0; font-size:22px; } .section-head span { color:var(--muted); font-size:13px; }
+    .news-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; } .news-item { background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:14px; } .item-top { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; } .item-index { min-width:34px; height:28px; background:#dce9ff; color:var(--accent-2); font-size:12px; font-weight:800; } .item-source,.item-top time { font-size:12px; color:var(--muted); font-weight:700; } .news-item h3 { margin:0 0 8px; font-size:18px; line-height:1.35; } .news-item p { margin-bottom:10px; }
+    .table-panel { margin-top:18px; overflow:hidden; } .panel-head { padding:14px 16px; display:flex; justify-content:space-between; gap:10px; border-bottom:1px solid var(--line); } .panel-head h2 { margin:0; font-size:20px; } .panel-head span { color:var(--muted); font-size:13px; } .table-wrap { overflow-x:auto; } table { width:100%; min-width:1050px; border-collapse:collapse; } th,td { padding:12px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; font-size:14px; } th { position:sticky; top:0; background:#edf4ff; color:#15385a; z-index:1; } .cell-index { width:60px; text-align:center; font-weight:800; color:var(--accent); } .cell-title { min-width:320px; font-weight:700; }
+    .empty-state { display:none; background:#fff7f6; border:1px solid #f3d2cf; color:#7a2620; border-radius:8px; padding:14px 16px; margin:18px 0 0; } .footer-note { color:var(--muted); font-size:13px; margin-top:14px; text-align:center; } .hidden { display:none!important; }
+    @media (max-width:1180px) { .lead-grid,.news-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:860px) { .page { width:min(100% - 18px,100%); margin:10px auto 24px; } .hero { padding:18px; } .hero-top,.toolbar { grid-template-columns:1fr; display:grid; } .hero h1 { font-size:26px; } .lead-grid,.news-grid,.stats-grid { grid-template-columns:1fr; } .stat-card-wide { grid-column:auto; } .panel-head { align-items:flex-start; flex-direction:column; } }
   </style>
 </head>
 <body>
   <main class="page">
-    <section class="hero">
-      <div class="hero-top">
-        <div>
-          <h1>每日新聞核心話題 即時版</h1>
-          <p>聚焦最近 6 小時內的重要新聞，來源限定 Yahoo新聞、中時新聞網、TVBS新聞網、東森新聞網。</p>
-          <p>主題涵蓋政治、財經、證券、AI科技、電競遊戲，方便你直接在瀏覽器閱讀。</p>
-        </div>
-        <aside class="hero-side">
-          <strong>最後更新</strong>
-          <span id="updatedAt">2026/06/24 02:08</span>
-          <small>排程時間：每日 01:00 / 07:00 / 13:00 / 19:00</small>
-        </aside>
-      </div>
-
-      <div class="toolbar">
-        <div class="toolbar-card">
-          <div class="toolbar-label">搜尋標題、摘要或來源</div>
-          <input id="searchInput" class="search-input" type="search" placeholder="例如：台積電、AI、以色列、遊戲股">
-        </div>
-        <div class="toolbar-card">
-          <div class="toolbar-label">依類別篩選</div>
-          <div class="filter-row" id="filterRow">
-            <button class="filter-chip is-active" type="button" data-filter="全部">全部</button><button class="filter-chip" type="button" data-filter="國際">國際 <span>11</span></button><button class="filter-chip" type="button" data-filter="政治">政治 <span>6</span></button><button class="filter-chip" type="button" data-filter="AI科技">AI科技 <span>8</span></button><button class="filter-chip" type="button" data-filter="財經/證券">財經/證券 <span>4</span></button><button class="filter-chip" type="button" data-filter="電競遊戲">電競遊戲 <span>1</span></button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    
-    <section class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">本輪新聞數</div>
-        <div class="stat-value">30</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">更新頻率</div>
-        <div class="stat-value stat-value-small">每 6 小時</div>
-      </div>
-      <div class="stat-card stat-card-wide">
-        <div class="stat-label">來源分布</div>
-        <div class="chips"><span class="chip"><strong>Yahoo新聞</strong><em>8 則</em></span><span class="chip"><strong>TVBS新聞網</strong><em>7 則</em></span><span class="chip"><strong>東森新聞網</strong><em>7 則</em></span><span class="chip"><strong>中時新聞網</strong><em>8 則</em></span></div>
-      </div>
-      <div class="stat-card stat-card-wide">
-        <div class="stat-label">類別分布</div>
-        <div class="chips"><span class="chip"><strong>國際</strong><em>11 則</em></span><span class="chip"><strong>政治</strong><em>6 則</em></span><span class="chip"><strong>AI科技</strong><em>8 則</em></span><span class="chip"><strong>財經/證券</strong><em>4 則</em></span><span class="chip"><strong>電競遊戲</strong><em>1 則</em></span></div>
-      </div>
-    </section>
-    
-
-    <section class="lead-grid" id="leadGrid">
-      
-            <article class="lead-card" data-category="國際" data-source="Yahoo新聞">
-              <div class="lead-meta">
-                <span class="badge">1</span>
-                <span class="badge badge-soft">國際</span>
-                <span class="badge badge-soft">Yahoo新聞</span>
-              </div>
-              <h2>真主黨要求以色列限期撤軍 黎巴嫩邊境再傳槍響奪2命</h2>
-              <p>黎巴嫩真主黨（Hezbollah）領袖 Naim Qassem 要求以色列軍隊必須依循時間表，完全撤</p>
-              <div class="lead-footer">
-                <span>06/24 01:43</span>
-                <a href="https://tw.news.yahoo.com/%E7%9C%9F%E4%B8%BB%E9%BB%A8%E8%A6%81%E6%B1%82%E4%BB%A5%E8%89%B2%E5%88%97%E9%99%90%E6%9C%9F%E6%92%A4%E8%BB%8D-%E9%BB%8E%E5%B7%B4%E5%AB%A9%E9%82%8A%E5%A2%83%E5%86%8D%E5%82%B3%E6%A7%8D%E9%9F%BF%E5%A5%AA2%E5%91%BD-172834809.html" target="_blank" rel="noopener noreferrer">查看原文</a>
-              </div>
-            </article>
-            
-            <article class="lead-card" data-category="政治" data-source="Yahoo新聞">
-              <div class="lead-meta">
-                <span class="badge">2</span>
-                <span class="badge badge-soft">政治</span>
-                <span class="badge badge-soft">Yahoo新聞</span>
-              </div>
-              <h2>尚比亞前總統遺體爭奪戰 南非法院判決家屬勝訴</h2>
-              <p>尚比亞前總統 Edgar Lungu 逝世一年多卻因政治恩怨無法入土。南非最高上訴法院週二做出關鍵判</p>
-              <div class="lead-footer">
-                <span>06/24 01:43</span>
-                <a href="https://tw.news.yahoo.com/%E5%B0%9A%E6%AF%94%E4%BA%9E%E5%89%8D%E7%B8%BD%E7%B5%B1%E9%81%BA%E9%AB%94%E7%88%AD%E5%A5%AA%E6%88%B0-%E5%8D%97%E9%9D%9E%E6%B3%95%E9%99%A2%E5%88%A4%E6%B1%BA%E5%AE%B6%E5%B1%AC%E5%8B%9D%E8%A8%B4-174335712.html" target="_blank" rel="noopener noreferrer">查看原文</a>
-              </div>
-            </article>
-            
-            <article class="lead-card" data-category="AI科技" data-source="Yahoo新聞">
-              <div class="lead-meta">
-                <span class="badge">3</span>
-                <span class="badge badge-soft">AI科技</span>
-                <span class="badge badge-soft">Yahoo新聞</span>
-              </div>
-              <h2>國際資料公司AI平台問世 科技情報可驗證加速決策</h2>
-              <p>商傳媒｜責任編輯／綜合外電報導國際資料公司（IDC）近日推出其人工智慧平台 IDC Quanta，旨</p>
-              <div class="lead-footer">
-                <span>06/24 01:43</span>
-                <a href="https://tw.stock.yahoo.com/news/%E5%9C%8B%E9%9A%9B%E8%B3%87%E6%96%99%E5%85%AC%E5%8F%B8ai%E5%B9%B3%E5%8F%B0%E5%95%8F%E4%B8%96-%E7%A7%91%E6%8A%80%E6%83%85%E5%A0%B1%E5%8F%AF%E9%A9%97%E8%AD%89%E5%8A%A0%E9%80%9F%E6%B1%BA%E7%AD%96-174336724.html" target="_blank" rel="noopener noreferrer">查看原文</a>
-              </div>
-            </article>
-            
-            <article class="lead-card" data-category="國際" data-source="Yahoo新聞">
-              <div class="lead-meta">
-                <span class="badge">4</span>
-                <span class="badge badge-soft">國際</span>
-                <span class="badge badge-soft">Yahoo新聞</span>
-              </div>
-              <h2>沖繩美軍部署新銳反艦、防空系統 強化嚇阻</h2>
-              <p>記者丘學陞／綜合報導 日本「共同社」22日報導，駐沖繩美軍陸戰隊日前已正式部署「海軍／陸戰隊遠征艦隊</p>
-              <div class="lead-footer">
-                <span>06/24 01:32</span>
-                <a href="https://tw.news.yahoo.com/%E6%B2%96%E7%B9%A9%E7%BE%8E%E8%BB%8D%E9%83%A8%E7%BD%B2%E6%96%B0%E9%8A%B3%E5%8F%8D%E8%89%A6-%E9%98%B2%E7%A9%BA%E7%B3%BB%E7%B5%B1-%E5%BC%B7%E5%8C%96%E5%9A%87%E9%98%BB-173200875.html" target="_blank" rel="noopener noreferrer">查看原文</a>
-              </div>
-            </article>
-            
-    </section>
-
+    <section class="hero"><div class="hero-top"><div><h1>每日新聞核心話題 即時版</h1><p>聚焦最近 6 小時內的重要新聞，來源限定 Yahoo新聞、中時新聞網、TVBS新聞網、東森新聞網。</p><p>主題涵蓋政治、財經、證券、AI科技、電競遊戲，方便你直接在瀏覽器閱讀。</p></div><aside class="hero-side"><strong>最後更新</strong><span id="updatedAt">2026/06/24 13:16</span><small>排程時間：每日 01:00 / 07:00 / 13:00 / 19:00</small></aside></div><div class="toolbar"><div class="toolbar-card"><div class="toolbar-label">搜尋標題、摘要或來源</div><input id="searchInput" class="search-input" type="search" placeholder="例如：台積電、AI、以色列、遊戲股"></div><div class="toolbar-card"><div class="toolbar-label">依類別篩選</div><div class="filter-row" id="filterRow"><button class="filter-chip is-active" type="button" data-filter="全部">全部</button><button class="filter-chip" type="button" data-filter="AI科技">AI科技 <span>17</span></button><button class="filter-chip" type="button" data-filter="電競遊戲">電競遊戲 <span>1</span></button><button class="filter-chip" type="button" data-filter="國際">國際 <span>7</span></button><button class="filter-chip" type="button" data-filter="財經/證券">財經/證券 <span>1</span></button><button class="filter-chip" type="button" data-filter="政治">政治 <span>4</span></button></div></div></div></section>
+    <section class="stats-grid"><div class="stat-card"><div class="stat-label">本輪新聞數</div><div class="stat-value">30</div></div><div class="stat-card"><div class="stat-label">更新頻率</div><div class="stat-value stat-value-small">每 6 小時</div></div><div class="stat-card stat-card-wide"><div class="stat-label">來源分布</div><div class="chips"><span class="chip"><strong>Yahoo新聞</strong><em>8 則</em></span><span class="chip"><strong>中時新聞網</strong><em>8 則</em></span><span class="chip"><strong>TVBS新聞網</strong><em>7 則</em></span><span class="chip"><strong>東森新聞網</strong><em>7 則</em></span></div></div><div class="stat-card stat-card-wide"><div class="stat-label">類別分布</div><div class="chips"><span class="chip"><strong>AI科技</strong><em>17 則</em></span><span class="chip"><strong>電競遊戲</strong><em>1 則</em></span><span class="chip"><strong>國際</strong><em>7 則</em></span><span class="chip"><strong>財經/證券</strong><em>1 則</em></span><span class="chip"><strong>政治</strong><em>4 則</em></span></div></div></section>
+    <section class="lead-grid" id="leadGrid"><article class="lead-card" data-category="AI科技" data-source="Yahoo新聞">
+  <div class="lead-meta"><span class="badge">1</span><span class="badge badge-soft">AI科技</span><span class="badge badge-soft">Yahoo新聞</span></div>
+  <h2>企業獲利嚴重分歧 台灣5000大企業總營收首破48.5兆元 虧損家數年增逾4成</h2><p>全球AI算力需求爆發，帶動5000大企業總體營運向上走揚，根據CRIF中華徵信所今天（24日）公布的</p>
+  <div class="lead-footer"><span>06/24 13:10</span><a href="https://tw.news.yahoo.com/%E4%BC%81%E6%A5%AD%E7%8D%B2%E5%88%A9%E5%9A%B4%E9%87%8D%E5%88%86%E6%AD%A7-%E5%8F%B0%E7%81%A35000%E5%A4%A7%E4%BC%81%E6%A5%AD%E7%B8%BD%E7%87%9F%E6%94%B6%E9%A6%96%E7%A0%B4485%E5%85%86%E5%85%83-%E8%99%A7%E6%90%8D%E5%AE%B6%E6%95%B8%E5%B9%B4%E5%A2%9E%E9%80%BE4%E6%88%90-051042387.html" target="_blank" rel="noopener noreferrer">查看原文</a></div>
+</article><article class="lead-card" data-category="AI科技" data-source="中時新聞網">
+  <div class="lead-meta"><span class="badge">2</span><span class="badge badge-soft">AI科技</span><span class="badge badge-soft">中時新聞網</span></div>
+  <h2>白營爆料蘇巧慧胞妹卻意外抓包葛如鈞 范雲酸：還有那些忘了</h2><p>民眾黨揭露民進黨新北市長參選人蘇巧慧胞妹蘇巧純擔任「威如科技」旗下akaSwap執行長，未依《公職人</p>
+  <div class="lead-footer"><span>06/24 13:11</span><a href="https://www.chinatimes.com/realtimenews/20260624002442-260407" target="_blank" rel="noopener noreferrer">查看原文</a></div>
+</article><article class="lead-card" data-category="AI科技" data-source="TVBS新聞網">
+  <div class="lead-meta"><span class="badge">3</span><span class="badge badge-soft">AI科技</span><span class="badge badge-soft">TVBS新聞網</span></div>
+  <h2>&#231;&#190; &#229;&#191;&#231;&#165;&#165;&#227;Rain&#227;&#230;&#179;&#176;&#230;&#176;&#229;&#164;&#167;&#229;&#183;&#168;&#232;&#230;&#165;&#229;&#233;&#232;&#182;&#180;&#239;&#188;&#227;&#230;&#168;&#229;&#164;&#169;&#230;&#161;&#231;&#191;&#227;&#232;&#190;&#163;&#229;&#185;&#180;&#231;&#179;&#232;&#182;&#180;&#227;7&#230;&#231;&#187;&#229; &#180;</h2><p>&#231;&#182;&#230;&#163;&#231;&#231;&#231;&#177;&#232;&#161;&#231;&#175;&#229;&#165;&#233;&#228;&#184;&#228;&#186;&#230;&#180;&#178;&#233; &#229;&#176;&#231;&#232;&#229;</p>
+  <div class="lead-footer"><span>06/24 12:26</span><a href="https://news.tvbs.com.tw/entertainment/3239287" target="_blank" rel="noopener noreferrer">查看原文</a></div>
+</article><article class="lead-card" data-category="電競遊戲" data-source="東森新聞網">
+  <div class="lead-meta"><span class="badge">4</span><span class="badge badge-soft">電競遊戲</span><span class="badge badge-soft">東森新聞網</span></div>
+  <h2>T1冠軍造型帥氣亮相！Faker六星加里歐、滿滿彩蛋連「石像」都有</h2><p>還記得 2025《英雄聯盟》世界賽的傳奇旅程嗎，經過五場大戰 T1 最終擊敗 KT 建立三連霸王朝，</p>
+  <div class="lead-footer"><span>06/24 12:31</span><a href="https://game.ettoday.net/article/3188795.htm" target="_blank" rel="noopener noreferrer">查看原文</a></div>
+</article></section>
     <div class="empty-state" id="emptyState">目前沒有符合搜尋或篩選條件的新聞。</div>
-
-    <section class="category-stack" id="categoryStack">
-      
-            <section class="category-block" data-category-group="國際">
-              <div class="section-head">
-                <h2>國際</h2>
-                <span>11 則</span>
-              </div>
-              <div class="news-grid">
-                
-                <article class="news-item" data-category="國際" data-source="Yahoo新聞" data-title="真主黨要求以色列限期撤軍 黎巴嫩邊境再傳槍響奪2命">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">01</span>
-                      <span class="item-source">Yahoo新聞</span>
-                    </div>
-                    <time>06/24 01:43</time>
-                  </div>
-                  <h3>真主黨要求以色列限期撤軍 黎巴嫩邊境再傳槍響奪2命</h3>
-                  <p>黎巴嫩真主黨（Hezbollah）領袖 Naim Qassem 要求以色列軍隊必須依循時間表，完全撤</p>
-                  <a href="https://tw.news.yahoo.com/%E7%9C%9F%E4%B8%BB%E9%BB%A8%E8%A6%81%E6%B1%82%E4%BB%A5%E8%89%B2%E5%88%97%E9%99%90%E6%9C%9F%E6%92%A4%E8%BB%8D-%E9%BB%8E%E5%B7%B4%E5%AB%A9%E9%82%8A%E5%A2%83%E5%86%8D%E5%82%B3%E6%A7%8D%E9%9F%BF%E5%A5%AA2%E5%91%BD-172834809.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="國際" data-source="Yahoo新聞" data-title="沖繩美軍部署新銳反艦、防空系統 強化嚇阻">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">04</span>
-                      <span class="item-source">Yahoo新聞</span>
-                    </div>
-                    <time>06/24 01:32</time>
-                  </div>
-                  <h3>沖繩美軍部署新銳反艦、防空系統 強化嚇阻</h3>
-                  <p>記者丘學陞／綜合報導 日本「共同社」22日報導，駐沖繩美軍陸戰隊日前已正式部署「海軍／陸戰隊遠征艦隊</p>
-                  <a href="https://tw.news.yahoo.com/%E6%B2%96%E7%B9%A9%E7%BE%8E%E8%BB%8D%E9%83%A8%E7%BD%B2%E6%96%B0%E9%8A%B3%E5%8F%8D%E8%89%A6-%E9%98%B2%E7%A9%BA%E7%B3%BB%E7%B5%B1-%E5%BC%B7%E5%8C%96%E5%9A%87%E9%98%BB-173200875.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="國際" data-source="Yahoo新聞" data-title="美伊達成協議 國際海事組織將撤離滯留波灣船員">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">07</span>
-                      <span class="item-source">Yahoo新聞</span>
-                    </div>
-                    <time>06/24 01:21</time>
-                  </div>
-                  <h3>美伊達成協議 國際海事組織將撤離滯留波灣船員</h3>
-                  <p>（中央社倫敦23日綜合外電報導）聯合國機構國際海事組織（International Maritime</p>
-                  <a href="https://tw.news.yahoo.com/%E7%BE%8E%E4%BC%8A%E9%81%94%E6%88%90%E5%8D%94%E8%AD%B0-%E5%9C%8B%E9%9A%9B%E6%B5%B7%E4%BA%8B%E7%B5%84%E7%B9%94%E5%B0%87%E6%92%A4%E9%9B%A2%E6%BB%AF%E7%95%99%E6%B3%A2%E7%81%A3%E8%88%B9%E5%93%A1-172119071.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="國際" data-source="東森新聞網" data-title="米克拉強撲日本「雙颱夾擊」狂灌雨 專家警告：2地長時間豪雨">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">10</span>
-                      <span class="item-source">東森新聞網</span>
-                    </div>
-                    <time>06/24 00:25</time>
-                  </div>
-                  <h3>米克拉強撲日本「雙颱夾擊」狂灌雨 專家警告：2地長時間豪雨</h3>
-                  <p>太平洋雙颱都往日本去？日本周邊海域進入雙颱風發展階段，日本氣象廳表示， 7號中颱「米克拉」持續維持強</p>
-                  <a href="https://www.ettoday.net/news/20260624/3188581.htm" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="國際" data-source="中時新聞網" data-title="誤以為老化或壓力大 癌症專家點名5常見危險徵兆">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">11</span>
-                      <span class="item-source">中時新聞網</span>
-                    </div>
-                    <time>06/24 00:21</time>
-                  </div>
-                  <h3>誤以為老化或壓力大 癌症專家點名5常見危險徵兆</h3>
-                  <p>隨著年齡增長，人體難免會出現疼痛與不適，但並非所有症狀皆因老化而起，有時可能是嚴重疾病的徵兆，例如癌</p>
-                  <a href="https://www.chinatimes.com/realtimenews/20260624000064-260408" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="國際" data-source="中時新聞網" data-title="加拿大重啟CANDU 重水反應爐外銷 搶攻全球核能復興商機">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">12</span>
-                      <span class="item-source">中時新聞網</span>
-                    </div>
-                    <time>06/24 00:17</time>
-                  </div>
-                  <h3>加拿大重啟CANDU 重水反應爐外銷 搶攻全球核能復興商機</h3>
-                  <p>加拿大政府日前公布新的國家核能戰略，宣布未來15年內將新建最多10座核反應爐、擴大鈾出口並推動小型模</p>
-                  <a href="https://www.chinatimes.com/realtimenews/20260624000065-260408" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="國際" data-source="TVBS新聞網" data-title="日本「梅雨+雙颱」夾擊！氣象廳示警：豪雨警戒升級">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">14</span>
-                      <span class="item-source">TVBS新聞網</span>
-                    </div>
-                    <time>06/23 23:49</time>
-                  </div>
-                  <h3>日本「梅雨+雙颱」夾擊！氣象廳示警：豪雨警戒升級</h3>
-                  <p>日本氣象廳表示，第8號颱風無花果今天上午正式生成，20日生成的第7號颱風米克拉則已發展為強烈颱風，預</p>
-                  <a href="https://news.tvbs.com.tw/world/3238964" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="國際" data-source="中時新聞網" data-title="影》神獵技！澳洲新品種蜘蛛編織「超彈力陷阱」捕天敵">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">18</span>
-                      <span class="item-source">中時新聞網</span>
-                    </div>
-                    <time>06/23 23:30</time>
-                  </div>
-                  <h3>影》神獵技！澳洲新品種蜘蛛編織「超彈力陷阱」捕天敵</h3>
-                  <p>澳洲學界最近在北部熱帶雨林深處發現新品種蜘蛛具備令人驚嘆的獵捕技能，牠們吐絲製作精密的彈弓式陷阱，專</p>
-                  <a href="https://www.chinatimes.com/realtimenews/20260623004596-260408" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="國際" data-source="中時新聞網" data-title="21歲女星淚訴被迫剃頭道歉！因私約粉絲成AKB48首例開除">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">21</span>
-                      <span class="item-source">中時新聞網</span>
-                    </div>
-                    <time>06/23 23:15</time>
-                  </div>
-                  <h3>21歲女星淚訴被迫剃頭道歉！因私約粉絲成AKB48首例開除</h3>
-                  <p>日本偶像天團AKB48日前拋出震撼彈，成軍21年來首度開鍘「解約」重罰，對象是21歲的19期生花田藍</p>
-                  <a href="https://www.chinatimes.com/realtimenews/20260623004607-260404" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="國際" data-source="東森新聞網" data-title="神戶「冷凍屍案」震撼日本！男遭肢解上下身藏15年 前妻涉嫌被逮">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">22</span>
-                      <span class="item-source">東森新聞網</span>
-                    </div>
-                    <time>06/23 23:09</time>
-                  </div>
-                  <h3>神戶「冷凍屍案」震撼日本！男遭肢解上下身藏15年 前妻涉嫌被逮</h3>
-                  <p>日本神戶市中央區近日爆出一起震驚社會的公寓藏屍案，警方本月在住處冷凍庫內發現遭肢解男性遺體後，於23</p>
-                  <a href="https://www.ettoday.net/news/20260623/3188571.htm" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="國際" data-source="東森新聞網" data-title="94歲音樂教父離世！ 王力宏悲痛發聲「難忘他1事」：大開眼界">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">30</span>
-                      <span class="item-source">東森新聞網</span>
-                    </div>
-                    <time>06/23 22:07</time>
-                  </div>
-                  <h3>94歲音樂教父離世！ 王力宏悲痛發聲「難忘他1事」：大開眼界</h3>
-                  <p>美國樂壇傳奇製作人、被譽為「流行音樂教父」的Clive Davis日前辭世，享耆壽94歲，曾受他提攜</p>
-                  <a href="https://star.ettoday.net/news/3188560" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-              </div>
-            </section>
-            
-            <section class="category-block" data-category-group="政治">
-              <div class="section-head">
-                <h2>政治</h2>
-                <span>6 則</span>
-              </div>
-              <div class="news-grid">
-                
-                <article class="news-item" data-category="政治" data-source="Yahoo新聞" data-title="尚比亞前總統遺體爭奪戰 南非法院判決家屬勝訴">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">02</span>
-                      <span class="item-source">Yahoo新聞</span>
-                    </div>
-                    <time>06/24 01:43</time>
-                  </div>
-                  <h3>尚比亞前總統遺體爭奪戰 南非法院判決家屬勝訴</h3>
-                  <p>尚比亞前總統 Edgar Lungu 逝世一年多卻因政治恩怨無法入土。南非最高上訴法院週二做出關鍵判</p>
-                  <a href="https://tw.news.yahoo.com/%E5%B0%9A%E6%AF%94%E4%BA%9E%E5%89%8D%E7%B8%BD%E7%B5%B1%E9%81%BA%E9%AB%94%E7%88%AD%E5%A5%AA%E6%88%B0-%E5%8D%97%E9%9D%9E%E6%B3%95%E9%99%A2%E5%88%A4%E6%B1%BA%E5%AE%B6%E5%B1%AC%E5%8B%9D%E8%A8%B4-174335712.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="政治" data-source="Yahoo新聞" data-title="【戰略快評】「中」試探民主友盟安全承諾 升高地緣政治風險">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">06</span>
-                      <span class="item-source">Yahoo新聞</span>
-                    </div>
-                    <time>06/24 01:30</time>
-                  </div>
-                  <h3>【戰略快評】「中」試探民主友盟安全承諾 升高地緣政治風險</h3>
-                  <p>◎汪哲仁 隨著5月北京「川習會」落幕，臺灣在白宮的會後聲明與事實清單中雙雙缺席。美國總統川普透露曾與</p>
-                  <a href="https://tw.news.yahoo.com/%E6%88%B0%E7%95%A5%E5%BF%AB%E8%A9%95-%E4%B8%AD-%E8%A9%A6%E6%8E%A2%E6%B0%91%E4%B8%BB%E5%8F%8B%E7%9B%9F%E5%AE%89%E5%85%A8%E6%89%BF%E8%AB%BE-%E5%8D%87%E9%AB%98%E5%9C%B0%E7%B7%A3%E6%94%BF%E6%B2%BB%E9%A2%A8%E9%9A%AA-173000167.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="政治" data-source="TVBS新聞網" data-title="影音／光復洪災陰影！花蓮萬里溪有堰塞湖 居民備戰">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">17</span>
-                      <span class="item-source">TVBS新聞網</span>
-                    </div>
-                    <time>06/23 23:33</time>
-                  </div>
-                  <h3>影音／光復洪災陰影！花蓮萬里溪有堰塞湖 居民備戰</h3>
-                  <p>颱風米克拉逼台！萬里溪「600萬噸堰塞湖」拉警報 季連成示警：最快10天溢流 颱風米克拉逐步逼近台灣</p>
-                  <a href="https://news.tvbs.com.tw/politics/3238912" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="政治" data-source="TVBS新聞網" data-title="影音／臉呢？法籍男破壞鍾沛君看板 稱有創作價值">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">20</span>
-                      <span class="item-source">TVBS新聞網</span>
-                    </div>
-                    <time>06/23 23:17</time>
-                  </div>
-                  <h3>影音／臉呢？法籍男破壞鍾沛君看板 稱有創作價值</h3>
-                  <p>國民黨台北市議員鍾沛君的選舉看板近日驚傳遭到破壞，看板上議員的雙眼與面容竟被人整齊割下「挖空」。警方</p>
-                  <a href="https://news.tvbs.com.tw/politics/3238789" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="政治" data-source="東森新聞網" data-title="沒有革命的斷頭臺 施凱爾與一個失去方向的帝國">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">28</span>
-                      <span class="item-source">東森新聞網</span>
-                    </div>
-                    <time>06/23 23:00</time>
-                  </div>
-                  <h3>沒有革命的斷頭臺 施凱爾與一個失去方向的帝國</h3>
-                  <p>1986年的諾貝爾和平獎得主埃利．維瑟爾 (Elie Wiesel) 有一段廣為流傳的警語：「愛的反</p>
-                  <a href="https://forum.ettoday.net/news/3188237" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="政治" data-source="東森新聞網" data-title="德黑蘭否認同意IAEA核查 川普堅稱伊朗同意：否則談判就不會繼續">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">29</span>
-                      <span class="item-source">東森新聞網</span>
-                    </div>
-                    <time>06/23 22:19</time>
-                  </div>
-                  <h3>德黑蘭否認同意IAEA核查 川普堅稱伊朗同意：否則談判就不會繼續</h3>
-                  <p>美國財政部長貝森特（Scott Bessent）22日表示，伊朗已同意國際原子能總署（IAEA）人員</p>
-                  <a href="https://www.ettoday.net/news/20260623/3188564.htm" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-              </div>
-            </section>
-            
-            <section class="category-block" data-category-group="AI科技">
-              <div class="section-head">
-                <h2>AI科技</h2>
-                <span>8 則</span>
-              </div>
-              <div class="news-grid">
-                
-                <article class="news-item" data-category="AI科技" data-source="Yahoo新聞" data-title="國際資料公司AI平台問世 科技情報可驗證加速決策">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">03</span>
-                      <span class="item-source">Yahoo新聞</span>
-                    </div>
-                    <time>06/24 01:43</time>
-                  </div>
-                  <h3>國際資料公司AI平台問世 科技情報可驗證加速決策</h3>
-                  <p>商傳媒｜責任編輯／綜合外電報導國際資料公司（IDC）近日推出其人工智慧平台 IDC Quanta，旨</p>
-                  <a href="https://tw.stock.yahoo.com/news/%E5%9C%8B%E9%9A%9B%E8%B3%87%E6%96%99%E5%85%AC%E5%8F%B8ai%E5%B9%B3%E5%8F%B0%E5%95%8F%E4%B8%96-%E7%A7%91%E6%8A%80%E6%83%85%E5%A0%B1%E5%8F%AF%E9%A9%97%E8%AD%89%E5%8A%A0%E9%80%9F%E6%B1%BA%E7%AD%96-174336724.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="AI科技" data-source="Yahoo新聞" data-title="五眼聯盟：AI將升級網攻 籲加強資安防禦">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">05</span>
-                      <span class="item-source">Yahoo新聞</span>
-                    </div>
-                    <time>06/24 01:31</time>
-                  </div>
-                  <h3>五眼聯盟：AI將升級網攻 籲加強資安防禦</h3>
-                  <p>記者廖子杰／綜合報導 由美、英、加、澳、紐組成的「五眼聯盟」（Five Eyes）22日警告，持續發</p>
-                  <a href="https://tw.news.yahoo.com/%E4%BA%94%E7%9C%BC%E8%81%AF%E7%9B%9F-ai%E5%B0%87%E5%8D%87%E7%B4%9A%E7%B6%B2%E6%94%BB-%E7%B1%B2%E5%8A%A0%E5%BC%B7%E8%B3%87%E5%AE%89%E9%98%B2%E7%A6%A6-173100572.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="AI科技" data-source="Yahoo新聞" data-title="西班牙躍升歐洲投資重鎮 科技生醫與基礎設施受跨國企業青睞">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">08</span>
-                      <span class="item-source">Yahoo新聞</span>
-                    </div>
-                    <time>06/24 01:20</time>
-                  </div>
-                  <h3>西班牙躍升歐洲投資重鎮 科技生醫與基礎設施受跨國企業青睞</h3>
-                  <p>圖／示意圖商傳媒｜葉安庭／綜合外電報導西班牙正逐步成為歐洲最具吸引力的投資、創新與國際拓展目的地，其</p>
-                  <a href="https://tw.stock.yahoo.com/news/%E8%A5%BF%E7%8F%AD%E7%89%99%E8%BA%8D%E5%8D%87%E6%AD%90%E6%B4%B2%E6%8A%95%E8%B3%87%E9%87%8D%E9%8E%AE-%E7%A7%91%E6%8A%80%E7%94%9F%E9%86%AB%E8%88%87%E5%9F%BA%E7%A4%8E%E8%A8%AD%E6%96%BD%E5%8F%97%E8%B7%A8%E5%9C%8B%E4%BC%81%E6%A5%AD%E9%9D%92%E7%9D%9E-172015981.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="AI科技" data-source="東森新聞網" data-title="新書揭馬斯克憂中國侵台衝擊晶片供應 曾向川普示警">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">15</span>
-                      <span class="item-source">東森新聞網</span>
-                    </div>
-                    <time>06/23 23:43</time>
-                  </div>
-                  <h3>新書揭馬斯克憂中國侵台衝擊晶片供應 曾向川普示警</h3>
-                  <p>一本聚焦美國總統川普第2個總統任期的新書於今天出版，根據書中內容，馬斯克去年在白宮一場科技業高層會議</p>
-                  <a href="https://www.ettoday.net/news/20260623/3188548.htm" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="AI科技" data-source="中時新聞網" data-title="市場樂觀過頭！ 華爾街老將喊美股恐回檔20％ 發6大警訊">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">16</span>
-                      <span class="item-source">中時新聞網</span>
-                    </div>
-                    <time>06/23 23:35</time>
-                  </div>
-                  <h3>市場樂觀過頭！ 華爾街老將喊美股恐回檔20％ 發6大警訊</h3>
-                  <p>在AI題材持續發酵帶動下，美股今年以來維持強勢表現，標普500指數屢創歷史新高。不過，長期看多股市的</p>
-                  <a href="https://www.chinatimes.com/realtimenews/20260623004650-260410" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="AI科技" data-source="TVBS新聞網" data-title="影音／3階段自駕公車計畫！ 蔣萬安：明年開放民眾試乘">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">19</span>
-                      <span class="item-source">TVBS新聞網</span>
-                    </div>
-                    <time>06/23 23:21</time>
-                  </div>
-                  <h3>影音／3階段自駕公車計畫！ 蔣萬安：明年開放民眾試乘</h3>
-                  <p>台北市長蔣萬安今（23）日在市政會議正式宣布，台北市自駕公車將分成三階段推動，今年第三季預計先在台北</p>
-                  <a href="https://news.tvbs.com.tw/politics/3238694" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="AI科技" data-source="TVBS新聞網" data-title="《無名之輩》AI短劇線上看結局！救世主西恩介紹&amp;全集免費看攻略">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">23</span>
-                      <span class="item-source">TVBS新聞網</span>
-                    </div>
-                    <time>06/23 23:09</time>
-                  </div>
-                  <h3>《無名之輩》AI短劇線上看結局！救世主西恩介紹&amp;全集免費看攻略</h3>
-                  <p>AI短劇《無名之輩》正在熱播！本文帶劇迷掌握短劇線上看免費全集攻略，並解析劇情亮點與男主角救世主西恩</p>
-                  <a href="https://news.tvbs.com.tw/entertainment/3238968" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="AI科技" data-source="中時新聞網" data-title="韓國槓桿型ETF助漲助跌 加劇晶片權值股價格波動">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">25</span>
-                      <span class="item-source">中時新聞網</span>
-                    </div>
-                    <time>06/23 23:03</time>
-                  </div>
-                  <h3>韓國槓桿型ETF助漲助跌 加劇晶片權值股價格波動</h3>
-                  <p>在AI熱潮驅動下，韓國記憶體巨頭SK海力士與三星電子股價大幅攀升，追蹤兩家晶片巨頭的槓桿型單股ETF</p>
-                  <a href="https://www.chinatimes.com/realtimenews/20260623004511-260410" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-              </div>
-            </section>
-            
-            <section class="category-block" data-category-group="財經/證券">
-              <div class="section-head">
-                <h2>財經/證券</h2>
-                <span>4 則</span>
-              </div>
-              <div class="news-grid">
-                
-                <article class="news-item" data-category="財經/證券" data-source="TVBS新聞網" data-title="卡刷爆也要顧面子！4星座最愛「花錢撐場面」 帳戶餘額超悲劇">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">09</span>
-                      <span class="item-source">TVBS新聞網</span>
-                    </div>
-                    <time>06/24 01:00</time>
-                  </div>
-                  <h3>卡刷爆也要顧面子！4星座最愛「花錢撐場面」 帳戶餘額超悲劇</h3>
-                  <p>有些人花錢是為了讓自己開心，有些人則是為了投資未來，但還有一種人，花錢最大的原因竟然是「不想輸」。明</p>
-                  <a href="https://news.tvbs.com.tw/life/3233481" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="財經/證券" data-source="中時新聞網" data-title="大樂透頭獎13連槓 下期上看4億 端午加碼百萬開出6組">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">24</span>
-                      <span class="item-source">中時新聞網</span>
-                    </div>
-                    <time>06/23 23:05</time>
-                  </div>
-                  <h3>大樂透頭獎13連槓 下期上看4億 端午加碼百萬開出6組</h3>
-                  <p>大樂透23日晚間開獎，頭獎再度槓龜，台灣彩券表示，大樂透頭獎已連續13期槓龜，預估下期銷售金額2至2</p>
-                  <a href="https://www.chinatimes.com/realtimenews/20260623004599-260410" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="財經/證券" data-source="TVBS新聞網" data-title="踩利害關係人投資紅線！郭明鑑辭國泰董事 金管會下令清查">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">26</span>
-                      <span class="item-source">TVBS新聞網</span>
-                    </div>
-                    <time>06/23 23:03</time>
-                  </div>
-                  <h3>踩利害關係人投資紅線！郭明鑑辭國泰董事 金管會下令清查</h3>
-                  <p>國泰投信昨天公告郭明鑑辭任董事，外界關注他是否有擔任其他上市公司董事但未申報，導致國泰投信可能違規投</p>
-                  <a href="https://news.tvbs.com.tw/life/3238891" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-                <article class="news-item" data-category="財經/證券" data-source="中時新聞網" data-title="平愛梨帶4子現身世界盃挺國腳老公 配音《哆啦A夢》意外治好小孩賴床">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">27</span>
-                      <span class="item-source">中時新聞網</span>
-                    </div>
-                    <time>06/23 23:01</time>
-                  </div>
-                  <h3>平愛梨帶4子現身世界盃挺國腳老公 配音《哆啦A夢》意外治好小孩賴床</h3>
-                  <p>蟬聯日本票房6週冠軍、累計動員超過334萬人次、票房突破42億日圓的《電影哆啦A夢：新‧大雄的海底鬼</p>
-                  <a href="https://www.chinatimes.com/realtimenews/20260623004433-260404" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-              </div>
-            </section>
-            
-            <section class="category-block" data-category-group="電競遊戲">
-              <div class="section-head">
-                <h2>電競遊戲</h2>
-                <span>1 則</span>
-              </div>
-              <div class="news-grid">
-                
-                <article class="news-item" data-category="電競遊戲" data-source="東森新聞網" data-title="使用AI恐影響遊戲評價 研究揭評論數少50%...負面觀感成關鍵">
-                  <div class="item-top">
-                    <div class="item-badges">
-                      <span class="item-index">13</span>
-                      <span class="item-source">東森新聞網</span>
-                    </div>
-                    <time>06/24 00:08</time>
-                  </div>
-                  <h3>使用AI恐影響遊戲評價 研究揭評論數少50%...負面觀感成關鍵</h3>
-                  <p>隨著生成式 AI 與聊天機器人技術快速發展，遊戲產業近年持續圍繞其應用價值展開討論，若從市場表現角度</p>
-                  <a href="https://game.ettoday.net/article/3188559.htm" target="_blank" rel="noopener noreferrer">開啟原文</a>
-                </article>
-                
-              </div>
-            </section>
-            
-    </section>
-
-    <section class="table-panel">
-      <div class="panel-head">
-        <h2>完整清單</h2>
-        <span>想快速掃過全部標題時，可以看這個表格。</span>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>類別</th>
-              <th>來源</th>
-              <th>時間</th>
-              <th>標題</th>
-              <th>摘要</th>
-              <th>原文</th>
-            </tr>
-          </thead>
-          <tbody id="newsTableBody">
-            
-            <tr data-category="國際" data-source="Yahoo新聞" data-title="真主黨要求以色列限期撤軍 黎巴嫩邊境再傳槍響奪2命">
-              <td class="cell-index">1</td>
-              <td>國際</td>
-              <td>Yahoo新聞</td>
-              <td>06/24 01:43</td>
-              <td class="cell-title">真主黨要求以色列限期撤軍 黎巴嫩邊境再傳槍響奪2命</td>
-              <td>黎巴嫩真主黨（Hezbollah）領袖 Naim Qassem 要求以色列軍隊必須依循時間表，完全撤</td>
-              <td><a href="https://tw.news.yahoo.com/%E7%9C%9F%E4%B8%BB%E9%BB%A8%E8%A6%81%E6%B1%82%E4%BB%A5%E8%89%B2%E5%88%97%E9%99%90%E6%9C%9F%E6%92%A4%E8%BB%8D-%E9%BB%8E%E5%B7%B4%E5%AB%A9%E9%82%8A%E5%A2%83%E5%86%8D%E5%82%B3%E6%A7%8D%E9%9F%BF%E5%A5%AA2%E5%91%BD-172834809.html" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="政治" data-source="Yahoo新聞" data-title="尚比亞前總統遺體爭奪戰 南非法院判決家屬勝訴">
-              <td class="cell-index">2</td>
-              <td>政治</td>
-              <td>Yahoo新聞</td>
-              <td>06/24 01:43</td>
-              <td class="cell-title">尚比亞前總統遺體爭奪戰 南非法院判決家屬勝訴</td>
-              <td>尚比亞前總統 Edgar Lungu 逝世一年多卻因政治恩怨無法入土。南非最高上訴法院週二做出關鍵判</td>
-              <td><a href="https://tw.news.yahoo.com/%E5%B0%9A%E6%AF%94%E4%BA%9E%E5%89%8D%E7%B8%BD%E7%B5%B1%E9%81%BA%E9%AB%94%E7%88%AD%E5%A5%AA%E6%88%B0-%E5%8D%97%E9%9D%9E%E6%B3%95%E9%99%A2%E5%88%A4%E6%B1%BA%E5%AE%B6%E5%B1%AC%E5%8B%9D%E8%A8%B4-174335712.html" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="AI科技" data-source="Yahoo新聞" data-title="國際資料公司AI平台問世 科技情報可驗證加速決策">
-              <td class="cell-index">3</td>
-              <td>AI科技</td>
-              <td>Yahoo新聞</td>
-              <td>06/24 01:43</td>
-              <td class="cell-title">國際資料公司AI平台問世 科技情報可驗證加速決策</td>
-              <td>商傳媒｜責任編輯／綜合外電報導國際資料公司（IDC）近日推出其人工智慧平台 IDC Quanta，旨</td>
-              <td><a href="https://tw.stock.yahoo.com/news/%E5%9C%8B%E9%9A%9B%E8%B3%87%E6%96%99%E5%85%AC%E5%8F%B8ai%E5%B9%B3%E5%8F%B0%E5%95%8F%E4%B8%96-%E7%A7%91%E6%8A%80%E6%83%85%E5%A0%B1%E5%8F%AF%E9%A9%97%E8%AD%89%E5%8A%A0%E9%80%9F%E6%B1%BA%E7%AD%96-174336724.html" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="國際" data-source="Yahoo新聞" data-title="沖繩美軍部署新銳反艦、防空系統 強化嚇阻">
-              <td class="cell-index">4</td>
-              <td>國際</td>
-              <td>Yahoo新聞</td>
-              <td>06/24 01:32</td>
-              <td class="cell-title">沖繩美軍部署新銳反艦、防空系統 強化嚇阻</td>
-              <td>記者丘學陞／綜合報導 日本「共同社」22日報導，駐沖繩美軍陸戰隊日前已正式部署「海軍／陸戰隊遠征艦隊</td>
-              <td><a href="https://tw.news.yahoo.com/%E6%B2%96%E7%B9%A9%E7%BE%8E%E8%BB%8D%E9%83%A8%E7%BD%B2%E6%96%B0%E9%8A%B3%E5%8F%8D%E8%89%A6-%E9%98%B2%E7%A9%BA%E7%B3%BB%E7%B5%B1-%E5%BC%B7%E5%8C%96%E5%9A%87%E9%98%BB-173200875.html" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="AI科技" data-source="Yahoo新聞" data-title="五眼聯盟：AI將升級網攻 籲加強資安防禦">
-              <td class="cell-index">5</td>
-              <td>AI科技</td>
-              <td>Yahoo新聞</td>
-              <td>06/24 01:31</td>
-              <td class="cell-title">五眼聯盟：AI將升級網攻 籲加強資安防禦</td>
-              <td>記者廖子杰／綜合報導 由美、英、加、澳、紐組成的「五眼聯盟」（Five Eyes）22日警告，持續發</td>
-              <td><a href="https://tw.news.yahoo.com/%E4%BA%94%E7%9C%BC%E8%81%AF%E7%9B%9F-ai%E5%B0%87%E5%8D%87%E7%B4%9A%E7%B6%B2%E6%94%BB-%E7%B1%B2%E5%8A%A0%E5%BC%B7%E8%B3%87%E5%AE%89%E9%98%B2%E7%A6%A6-173100572.html" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="政治" data-source="Yahoo新聞" data-title="【戰略快評】「中」試探民主友盟安全承諾 升高地緣政治風險">
-              <td class="cell-index">6</td>
-              <td>政治</td>
-              <td>Yahoo新聞</td>
-              <td>06/24 01:30</td>
-              <td class="cell-title">【戰略快評】「中」試探民主友盟安全承諾 升高地緣政治風險</td>
-              <td>◎汪哲仁 隨著5月北京「川習會」落幕，臺灣在白宮的會後聲明與事實清單中雙雙缺席。美國總統川普透露曾與</td>
-              <td><a href="https://tw.news.yahoo.com/%E6%88%B0%E7%95%A5%E5%BF%AB%E8%A9%95-%E4%B8%AD-%E8%A9%A6%E6%8E%A2%E6%B0%91%E4%B8%BB%E5%8F%8B%E7%9B%9F%E5%AE%89%E5%85%A8%E6%89%BF%E8%AB%BE-%E5%8D%87%E9%AB%98%E5%9C%B0%E7%B7%A3%E6%94%BF%E6%B2%BB%E9%A2%A8%E9%9A%AA-173000167.html" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="國際" data-source="Yahoo新聞" data-title="美伊達成協議 國際海事組織將撤離滯留波灣船員">
-              <td class="cell-index">7</td>
-              <td>國際</td>
-              <td>Yahoo新聞</td>
-              <td>06/24 01:21</td>
-              <td class="cell-title">美伊達成協議 國際海事組織將撤離滯留波灣船員</td>
-              <td>（中央社倫敦23日綜合外電報導）聯合國機構國際海事組織（International Maritime</td>
-              <td><a href="https://tw.news.yahoo.com/%E7%BE%8E%E4%BC%8A%E9%81%94%E6%88%90%E5%8D%94%E8%AD%B0-%E5%9C%8B%E9%9A%9B%E6%B5%B7%E4%BA%8B%E7%B5%84%E7%B9%94%E5%B0%87%E6%92%A4%E9%9B%A2%E6%BB%AF%E7%95%99%E6%B3%A2%E7%81%A3%E8%88%B9%E5%93%A1-172119071.html" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="AI科技" data-source="Yahoo新聞" data-title="西班牙躍升歐洲投資重鎮 科技生醫與基礎設施受跨國企業青睞">
-              <td class="cell-index">8</td>
-              <td>AI科技</td>
-              <td>Yahoo新聞</td>
-              <td>06/24 01:20</td>
-              <td class="cell-title">西班牙躍升歐洲投資重鎮 科技生醫與基礎設施受跨國企業青睞</td>
-              <td>圖／示意圖商傳媒｜葉安庭／綜合外電報導西班牙正逐步成為歐洲最具吸引力的投資、創新與國際拓展目的地，其</td>
-              <td><a href="https://tw.stock.yahoo.com/news/%E8%A5%BF%E7%8F%AD%E7%89%99%E8%BA%8D%E5%8D%87%E6%AD%90%E6%B4%B2%E6%8A%95%E8%B3%87%E9%87%8D%E9%8E%AE-%E7%A7%91%E6%8A%80%E7%94%9F%E9%86%AB%E8%88%87%E5%9F%BA%E7%A4%8E%E8%A8%AD%E6%96%BD%E5%8F%97%E8%B7%A8%E5%9C%8B%E4%BC%81%E6%A5%AD%E9%9D%92%E7%9D%9E-172015981.html" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="財經/證券" data-source="TVBS新聞網" data-title="卡刷爆也要顧面子！4星座最愛「花錢撐場面」 帳戶餘額超悲劇">
-              <td class="cell-index">9</td>
-              <td>財經/證券</td>
-              <td>TVBS新聞網</td>
-              <td>06/24 01:00</td>
-              <td class="cell-title">卡刷爆也要顧面子！4星座最愛「花錢撐場面」 帳戶餘額超悲劇</td>
-              <td>有些人花錢是為了讓自己開心，有些人則是為了投資未來，但還有一種人，花錢最大的原因竟然是「不想輸」。明</td>
-              <td><a href="https://news.tvbs.com.tw/life/3233481" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="國際" data-source="東森新聞網" data-title="米克拉強撲日本「雙颱夾擊」狂灌雨 專家警告：2地長時間豪雨">
-              <td class="cell-index">10</td>
-              <td>國際</td>
-              <td>東森新聞網</td>
-              <td>06/24 00:25</td>
-              <td class="cell-title">米克拉強撲日本「雙颱夾擊」狂灌雨 專家警告：2地長時間豪雨</td>
-              <td>太平洋雙颱都往日本去？日本周邊海域進入雙颱風發展階段，日本氣象廳表示， 7號中颱「米克拉」持續維持強</td>
-              <td><a href="https://www.ettoday.net/news/20260624/3188581.htm" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="國際" data-source="中時新聞網" data-title="誤以為老化或壓力大 癌症專家點名5常見危險徵兆">
-              <td class="cell-index">11</td>
-              <td>國際</td>
-              <td>中時新聞網</td>
-              <td>06/24 00:21</td>
-              <td class="cell-title">誤以為老化或壓力大 癌症專家點名5常見危險徵兆</td>
-              <td>隨著年齡增長，人體難免會出現疼痛與不適，但並非所有症狀皆因老化而起，有時可能是嚴重疾病的徵兆，例如癌</td>
-              <td><a href="https://www.chinatimes.com/realtimenews/20260624000064-260408" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="國際" data-source="中時新聞網" data-title="加拿大重啟CANDU 重水反應爐外銷 搶攻全球核能復興商機">
-              <td class="cell-index">12</td>
-              <td>國際</td>
-              <td>中時新聞網</td>
-              <td>06/24 00:17</td>
-              <td class="cell-title">加拿大重啟CANDU 重水反應爐外銷 搶攻全球核能復興商機</td>
-              <td>加拿大政府日前公布新的國家核能戰略，宣布未來15年內將新建最多10座核反應爐、擴大鈾出口並推動小型模</td>
-              <td><a href="https://www.chinatimes.com/realtimenews/20260624000065-260408" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="電競遊戲" data-source="東森新聞網" data-title="使用AI恐影響遊戲評價 研究揭評論數少50%...負面觀感成關鍵">
-              <td class="cell-index">13</td>
-              <td>電競遊戲</td>
-              <td>東森新聞網</td>
-              <td>06/24 00:08</td>
-              <td class="cell-title">使用AI恐影響遊戲評價 研究揭評論數少50%...負面觀感成關鍵</td>
-              <td>隨著生成式 AI 與聊天機器人技術快速發展，遊戲產業近年持續圍繞其應用價值展開討論，若從市場表現角度</td>
-              <td><a href="https://game.ettoday.net/article/3188559.htm" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="國際" data-source="TVBS新聞網" data-title="日本「梅雨+雙颱」夾擊！氣象廳示警：豪雨警戒升級">
-              <td class="cell-index">14</td>
-              <td>國際</td>
-              <td>TVBS新聞網</td>
-              <td>06/23 23:49</td>
-              <td class="cell-title">日本「梅雨+雙颱」夾擊！氣象廳示警：豪雨警戒升級</td>
-              <td>日本氣象廳表示，第8號颱風無花果今天上午正式生成，20日生成的第7號颱風米克拉則已發展為強烈颱風，預</td>
-              <td><a href="https://news.tvbs.com.tw/world/3238964" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="AI科技" data-source="東森新聞網" data-title="新書揭馬斯克憂中國侵台衝擊晶片供應 曾向川普示警">
-              <td class="cell-index">15</td>
-              <td>AI科技</td>
-              <td>東森新聞網</td>
-              <td>06/23 23:43</td>
-              <td class="cell-title">新書揭馬斯克憂中國侵台衝擊晶片供應 曾向川普示警</td>
-              <td>一本聚焦美國總統川普第2個總統任期的新書於今天出版，根據書中內容，馬斯克去年在白宮一場科技業高層會議</td>
-              <td><a href="https://www.ettoday.net/news/20260623/3188548.htm" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="AI科技" data-source="中時新聞網" data-title="市場樂觀過頭！ 華爾街老將喊美股恐回檔20％ 發6大警訊">
-              <td class="cell-index">16</td>
-              <td>AI科技</td>
-              <td>中時新聞網</td>
-              <td>06/23 23:35</td>
-              <td class="cell-title">市場樂觀過頭！ 華爾街老將喊美股恐回檔20％ 發6大警訊</td>
-              <td>在AI題材持續發酵帶動下，美股今年以來維持強勢表現，標普500指數屢創歷史新高。不過，長期看多股市的</td>
-              <td><a href="https://www.chinatimes.com/realtimenews/20260623004650-260410" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="政治" data-source="TVBS新聞網" data-title="影音／光復洪災陰影！花蓮萬里溪有堰塞湖 居民備戰">
-              <td class="cell-index">17</td>
-              <td>政治</td>
-              <td>TVBS新聞網</td>
-              <td>06/23 23:33</td>
-              <td class="cell-title">影音／光復洪災陰影！花蓮萬里溪有堰塞湖 居民備戰</td>
-              <td>颱風米克拉逼台！萬里溪「600萬噸堰塞湖」拉警報 季連成示警：最快10天溢流 颱風米克拉逐步逼近台灣</td>
-              <td><a href="https://news.tvbs.com.tw/politics/3238912" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="國際" data-source="中時新聞網" data-title="影》神獵技！澳洲新品種蜘蛛編織「超彈力陷阱」捕天敵">
-              <td class="cell-index">18</td>
-              <td>國際</td>
-              <td>中時新聞網</td>
-              <td>06/23 23:30</td>
-              <td class="cell-title">影》神獵技！澳洲新品種蜘蛛編織「超彈力陷阱」捕天敵</td>
-              <td>澳洲學界最近在北部熱帶雨林深處發現新品種蜘蛛具備令人驚嘆的獵捕技能，牠們吐絲製作精密的彈弓式陷阱，專</td>
-              <td><a href="https://www.chinatimes.com/realtimenews/20260623004596-260408" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="AI科技" data-source="TVBS新聞網" data-title="影音／3階段自駕公車計畫！ 蔣萬安：明年開放民眾試乘">
-              <td class="cell-index">19</td>
-              <td>AI科技</td>
-              <td>TVBS新聞網</td>
-              <td>06/23 23:21</td>
-              <td class="cell-title">影音／3階段自駕公車計畫！ 蔣萬安：明年開放民眾試乘</td>
-              <td>台北市長蔣萬安今（23）日在市政會議正式宣布，台北市自駕公車將分成三階段推動，今年第三季預計先在台北</td>
-              <td><a href="https://news.tvbs.com.tw/politics/3238694" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="政治" data-source="TVBS新聞網" data-title="影音／臉呢？法籍男破壞鍾沛君看板 稱有創作價值">
-              <td class="cell-index">20</td>
-              <td>政治</td>
-              <td>TVBS新聞網</td>
-              <td>06/23 23:17</td>
-              <td class="cell-title">影音／臉呢？法籍男破壞鍾沛君看板 稱有創作價值</td>
-              <td>國民黨台北市議員鍾沛君的選舉看板近日驚傳遭到破壞，看板上議員的雙眼與面容竟被人整齊割下「挖空」。警方</td>
-              <td><a href="https://news.tvbs.com.tw/politics/3238789" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="國際" data-source="中時新聞網" data-title="21歲女星淚訴被迫剃頭道歉！因私約粉絲成AKB48首例開除">
-              <td class="cell-index">21</td>
-              <td>國際</td>
-              <td>中時新聞網</td>
-              <td>06/23 23:15</td>
-              <td class="cell-title">21歲女星淚訴被迫剃頭道歉！因私約粉絲成AKB48首例開除</td>
-              <td>日本偶像天團AKB48日前拋出震撼彈，成軍21年來首度開鍘「解約」重罰，對象是21歲的19期生花田藍</td>
-              <td><a href="https://www.chinatimes.com/realtimenews/20260623004607-260404" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="國際" data-source="東森新聞網" data-title="神戶「冷凍屍案」震撼日本！男遭肢解上下身藏15年 前妻涉嫌被逮">
-              <td class="cell-index">22</td>
-              <td>國際</td>
-              <td>東森新聞網</td>
-              <td>06/23 23:09</td>
-              <td class="cell-title">神戶「冷凍屍案」震撼日本！男遭肢解上下身藏15年 前妻涉嫌被逮</td>
-              <td>日本神戶市中央區近日爆出一起震驚社會的公寓藏屍案，警方本月在住處冷凍庫內發現遭肢解男性遺體後，於23</td>
-              <td><a href="https://www.ettoday.net/news/20260623/3188571.htm" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="AI科技" data-source="TVBS新聞網" data-title="《無名之輩》AI短劇線上看結局！救世主西恩介紹&amp;全集免費看攻略">
-              <td class="cell-index">23</td>
-              <td>AI科技</td>
-              <td>TVBS新聞網</td>
-              <td>06/23 23:09</td>
-              <td class="cell-title">《無名之輩》AI短劇線上看結局！救世主西恩介紹&amp;全集免費看攻略</td>
-              <td>AI短劇《無名之輩》正在熱播！本文帶劇迷掌握短劇線上看免費全集攻略，並解析劇情亮點與男主角救世主西恩</td>
-              <td><a href="https://news.tvbs.com.tw/entertainment/3238968" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="財經/證券" data-source="中時新聞網" data-title="大樂透頭獎13連槓 下期上看4億 端午加碼百萬開出6組">
-              <td class="cell-index">24</td>
-              <td>財經/證券</td>
-              <td>中時新聞網</td>
-              <td>06/23 23:05</td>
-              <td class="cell-title">大樂透頭獎13連槓 下期上看4億 端午加碼百萬開出6組</td>
-              <td>大樂透23日晚間開獎，頭獎再度槓龜，台灣彩券表示，大樂透頭獎已連續13期槓龜，預估下期銷售金額2至2</td>
-              <td><a href="https://www.chinatimes.com/realtimenews/20260623004599-260410" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="AI科技" data-source="中時新聞網" data-title="韓國槓桿型ETF助漲助跌 加劇晶片權值股價格波動">
-              <td class="cell-index">25</td>
-              <td>AI科技</td>
-              <td>中時新聞網</td>
-              <td>06/23 23:03</td>
-              <td class="cell-title">韓國槓桿型ETF助漲助跌 加劇晶片權值股價格波動</td>
-              <td>在AI熱潮驅動下，韓國記憶體巨頭SK海力士與三星電子股價大幅攀升，追蹤兩家晶片巨頭的槓桿型單股ETF</td>
-              <td><a href="https://www.chinatimes.com/realtimenews/20260623004511-260410" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="財經/證券" data-source="TVBS新聞網" data-title="踩利害關係人投資紅線！郭明鑑辭國泰董事 金管會下令清查">
-              <td class="cell-index">26</td>
-              <td>財經/證券</td>
-              <td>TVBS新聞網</td>
-              <td>06/23 23:03</td>
-              <td class="cell-title">踩利害關係人投資紅線！郭明鑑辭國泰董事 金管會下令清查</td>
-              <td>國泰投信昨天公告郭明鑑辭任董事，外界關注他是否有擔任其他上市公司董事但未申報，導致國泰投信可能違規投</td>
-              <td><a href="https://news.tvbs.com.tw/life/3238891" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="財經/證券" data-source="中時新聞網" data-title="平愛梨帶4子現身世界盃挺國腳老公 配音《哆啦A夢》意外治好小孩賴床">
-              <td class="cell-index">27</td>
-              <td>財經/證券</td>
-              <td>中時新聞網</td>
-              <td>06/23 23:01</td>
-              <td class="cell-title">平愛梨帶4子現身世界盃挺國腳老公 配音《哆啦A夢》意外治好小孩賴床</td>
-              <td>蟬聯日本票房6週冠軍、累計動員超過334萬人次、票房突破42億日圓的《電影哆啦A夢：新‧大雄的海底鬼</td>
-              <td><a href="https://www.chinatimes.com/realtimenews/20260623004433-260404" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="政治" data-source="東森新聞網" data-title="沒有革命的斷頭臺 施凱爾與一個失去方向的帝國">
-              <td class="cell-index">28</td>
-              <td>政治</td>
-              <td>東森新聞網</td>
-              <td>06/23 23:00</td>
-              <td class="cell-title">沒有革命的斷頭臺 施凱爾與一個失去方向的帝國</td>
-              <td>1986年的諾貝爾和平獎得主埃利．維瑟爾 (Elie Wiesel) 有一段廣為流傳的警語：「愛的反</td>
-              <td><a href="https://forum.ettoday.net/news/3188237" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="政治" data-source="東森新聞網" data-title="德黑蘭否認同意IAEA核查 川普堅稱伊朗同意：否則談判就不會繼續">
-              <td class="cell-index">29</td>
-              <td>政治</td>
-              <td>東森新聞網</td>
-              <td>06/23 22:19</td>
-              <td class="cell-title">德黑蘭否認同意IAEA核查 川普堅稱伊朗同意：否則談判就不會繼續</td>
-              <td>美國財政部長貝森特（Scott Bessent）22日表示，伊朗已同意國際原子能總署（IAEA）人員</td>
-              <td><a href="https://www.ettoday.net/news/20260623/3188564.htm" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-            <tr data-category="國際" data-source="東森新聞網" data-title="94歲音樂教父離世！ 王力宏悲痛發聲「難忘他1事」：大開眼界">
-              <td class="cell-index">30</td>
-              <td>國際</td>
-              <td>東森新聞網</td>
-              <td>06/23 22:07</td>
-              <td class="cell-title">94歲音樂教父離世！ 王力宏悲痛發聲「難忘他1事」：大開眼界</td>
-              <td>美國樂壇傳奇製作人、被譽為「流行音樂教父」的Clive Davis日前辭世，享耆壽94歲，曾受他提攜</td>
-              <td><a href="https://star.ettoday.net/news/3188560" target="_blank" rel="noopener noreferrer">原文</a></td>
-            </tr>
-            
-          </tbody>
-        </table>
-      </div>
-    </section>
-
+    <section class="category-stack" id="categoryStack"><section class="category-block" data-category-group="AI科技"><div class="section-head"><h2>AI科技</h2><span>17 則</span></div><div class="news-grid"><article class="news-item" data-category="AI科技" data-source="Yahoo新聞">
+  <div class="item-top"><div class="item-badges"><span class="item-index">01</span><span class="item-source">Yahoo新聞</span></div><time>06/24 13:10</time></div>
+  <h3>企業獲利嚴重分歧 台灣5000大企業總營收首破48.5兆元 虧損家數年增逾4成</h3><p>全球AI算力需求爆發，帶動5000大企業總體營運向上走揚，根據CRIF中華徵信所今天（24日）公布的</p><a href="https://tw.news.yahoo.com/%E4%BC%81%E6%A5%AD%E7%8D%B2%E5%88%A9%E5%9A%B4%E9%87%8D%E5%88%86%E6%AD%A7-%E5%8F%B0%E7%81%A35000%E5%A4%A7%E4%BC%81%E6%A5%AD%E7%B8%BD%E7%87%9F%E6%94%B6%E9%A6%96%E7%A0%B4485%E5%85%86%E5%85%83-%E8%99%A7%E6%90%8D%E5%AE%B6%E6%95%B8%E5%B9%B4%E5%A2%9E%E9%80%BE4%E6%88%90-051042387.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="中時新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">02</span><span class="item-source">中時新聞網</span></div><time>06/24 13:11</time></div>
+  <h3>白營爆料蘇巧慧胞妹卻意外抓包葛如鈞 范雲酸：還有那些忘了</h3><p>民眾黨揭露民進黨新北市長參選人蘇巧慧胞妹蘇巧純擔任「威如科技」旗下akaSwap執行長，未依《公職人</p><a href="https://www.chinatimes.com/realtimenews/20260624002442-260407" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="TVBS新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">03</span><span class="item-source">TVBS新聞網</span></div><time>06/24 12:26</time></div>
+  <h3>&#231;&#190; &#229;&#191;&#231;&#165;&#165;&#227;Rain&#227;&#230;&#179;&#176;&#230;&#176;&#229;&#164;&#167;&#229;&#183;&#168;&#232;&#230;&#165;&#229;&#233;&#232;&#182;&#180;&#239;&#188;&#227;&#230;&#168;&#229;&#164;&#169;&#230;&#161;&#231;&#191;&#227;&#232;&#190;&#163;&#229;&#185;&#180;&#231;&#179;&#232;&#182;&#180;&#227;7&#230;&#231;&#187;&#229; &#180;</h3><p>&#231;&#182;&#230;&#163;&#231;&#231;&#231;&#177;&#232;&#161;&#231;&#175;&#229;&#165;&#233;&#228;&#184;&#228;&#186;&#230;&#180;&#178;&#233; &#229;&#176;&#231;&#232;&#229;</p><a href="https://news.tvbs.com.tw/entertainment/3239287" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="中時新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">06</span><span class="item-source">中時新聞網</span></div><time>06/24 13:10</time></div>
+  <h3>科技股失寵！台塑、台化「驚天漲停」 傳產老大哥們集體復活</h3><p>科技股靠邊站，但基期低的非電族群今（24）日成維繫多頭人心的重要焦點，塑膠股今天異軍突起，台塑（13</p><a href="https://www.chinatimes.com/realtimenews/20260624002517-260410" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="TVBS新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">07</span><span class="item-source">TVBS新聞網</span></div><time>06/24 12:17</time></div>
+  <h3>&#228;&#184;&#173;&#229;&#232;&#182; &#231;&#180;&#233;&#187;&#232; &#166;&#230; &#228;&#184;&#231;&#190;&#229;&#231;&#187;&#229; &#168;&#231;&#230;&#166;&#233;&#166;&#239;&#188;&#229;&#176;&#229;&#174;&#182;&#239;&#188;&#228;&#184;&#228;&#187;&#163;&#232;&#161;&#168;AI&#229;&#175;&#166;&#229;&#232;&#182; &#232;&#182;</h3><p>&#232;&#183;&#175;&#233;&#231;&#164;&#190;&#229;&#188;&#232;&#191;&#176;&#229;&#176;&#229;&#174;&#182;&#232;&#170;&#170;&#230;&#179;&#229; &#177;&#229;&#176;&#239;&#188;&#228;&#184;&#173;&#229;&#229;&#168;&#229; &#168;&#231;</p><a href="https://news.tvbs.com.tw/world/3239155" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="東森新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">08</span><span class="item-source">東森新聞網</span></div><time>06/24 12:27</time></div>
+  <h3>巴黎男裝周／Cortis趙雨凡、馬丁雙帥看秀！Saint Laurent把克制變最高級性感</h3><p>COER們終於等到了！男團Cortis成員趙雨凡（James）與隊長馬丁（Martin）出席巴黎男裝</p><a href="https://fashion.ettoday.net/news/3188891" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="Yahoo新聞">
+  <div class="item-top"><div class="item-badges"><span class="item-index">09</span><span class="item-source">Yahoo新聞</span></div><time>06/24 13:01</time></div>
+  <h3>鳳梨釋迦銷陸是「養套殺」？沈政男搬數據打臉綠營：美國對台晶片不也是？</h3><p>陸委會副主委梁文傑日前指出，台灣人幾乎不吃鳳梨釋迦，高達9成產量出口中國市場，並形容該作物「完全要仰</p><a href="https://tw.news.yahoo.com/%E9%B3%B3%E6%A2%A8%E9%87%8B%E8%BF%A6%E9%8A%B7%E9%99%B8%E6%98%AF-%E9%A4%8A%E5%A5%97%E6%AE%BA-%E6%B2%88%E6%94%BF%E7%94%B7%E6%90%AC%E6%95%B8%E6%93%9A%E6%89%93%E8%87%89%E7%B6%A0%E7%87%9F-%E7%BE%8E%E5%9C%8B%E5%B0%8D%E5%8F%B0%E6%99%B6%E7%89%87%E4%B8%8D%E4%B9%9F%E6%98%AF-050147475.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="中時新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">10</span><span class="item-source">中時新聞網</span></div><time>06/24 13:09</time></div>
+  <h3>中職》羅志祥、RAIN、泰民台韓舞王接力 跳翻桃猿辣年糕趴</h3><p>中華職棒上季總冠軍樂天桃猿在2026賽季的年度指標活動「辣年糕趴」，今年移師台北大巨蛋，7月24日到</p><a href="https://www.chinatimes.com/realtimenews/20260624002610-260403" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="TVBS新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">11</span><span class="item-source">TVBS新聞網</span></div><time>06/24 12:12</time></div>
+  <h3>&#230;&#230;&#167;AI&#230;&#228;&#187;&#163;&#229;&#189;&#232;&#239;&#188;&#227;&#231;&#189;&#231;&#228;&#184;&#227;&#229;&#179;&#176;&#230;&#232;&#175;&#229;&#186;&#230;&#173;&#229;&#185;&#227;&#231;&#190;&#228;&#184;&#173;&#232;&#183;&#230;&#182;&#231;&#230;&#176;&#230;&#176;&#232;&#174;&#229;&#177;</h3><p>&#231;&#190;&#228;&#184;&#173;&#232;&#183;&#229;&#229;&#176;&#233;&#171;&#232;&#167;&#229;&#229;&#231;&#180;&#239;&#188;&#232;&#183;&#232;&#173;&#230;&#172;&#233;&#177;&#230;&#173;&#163;&#229;&#188;</p><a href="https://news.tvbs.com.tw/tech/3239206" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="Yahoo新聞">
+  <div class="item-top"><div class="item-badges"><span class="item-index">13</span><span class="item-source">Yahoo新聞</span></div><time>06/24 13:01</time></div>
+  <h3>洋基女孩一暄化身「最正數學老師」！政大高材生親授3招讀書秘訣</h3><p>洋基工程啦啦隊「洋基女孩」全新YouTube頻道《洋基女孩ON AIR》持續推出新企劃，第三集找來政</p><a href="https://tw.news.yahoo.com/%E6%B4%8B%E5%9F%BA%E5%A5%B3%E5%AD%A9-%E6%9A%84%E5%8C%96%E8%BA%AB-%E6%9C%80%E6%AD%A3%E6%95%B8%E5%AD%B8%E8%80%81%E5%B8%AB-%E6%94%BF%E5%A4%A7%E9%AB%98%E6%9D%90%E7%94%9F%E8%A6%AA%E6%8E%883%E6%8B%9B%E8%AE%80%E6%9B%B8%E7%A7%98%E8%A8%A3-050100197.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="TVBS新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">15</span><span class="item-source">TVBS新聞網</span></div><time>06/24 12:12</time></div>
+  <h3>&#232;&#183;&#232;&#173;&#232;&#179;&#170;&#231;&#231;&#190;&#229;&#230;&#182;&#231;&#231;&#174;&#161;&#229;&#182;&#230;&#179;&#230;&#161;&#227;&#228;&#187;&#229; &#229; &#165;AI&#228;&#190;&#230;&#233;&#232;&#175;&#231;Pax Silica</h3><p>&#232;&#183;&#232;&#173;&#232;&#191;&#230;&#165;&#229;&#176;&#231;&#190;&#229;&#230;&#168;&#229;&#231;&#227;MATCH Act&#227;&#232;&#161;&#168;&#233;</p><a href="https://news.tvbs.com.tw/tech/3239202" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="TVBS新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">19</span><span class="item-source">TVBS新聞網</span></div><time>06/24 12:03</time></div>
+  <h3>AI&#231;&#230;&#189;&#174;&#229;&#185;&#230;&#179;&#161;&#230;&#179;&#161;&#239;&#188;&#231;&#190;&#229; &#233;&#173;&#232;&#161;&#230;&#180;&#231;&#231;13%&#227;&#229;&#176;&#229;&#174;&#182;&#230;&#173;&#232;&#229;&#190;&#232;&#180;&#229;&#189;&#229; &#167;&#229;&#185;</h3><p>&#229; &#168;&#231;&#232;&#168;&#230;&#182;&#233;&#171;&#230;&#182;&#231;&#230;&#231;&#190;&#164;23&#230;&#165;&#233;&#173;&#233;&#233;&#230;&#171;&#239;&#188;&#231;&#190;</p><a href="https://news.tvbs.com.tw/world/3239232" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="中時新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">22</span><span class="item-source">中時新聞網</span></div><time>06/24 13:04</time></div>
+  <h3>影》AIT與中市府合作無人機 盧秀燕：4大發展基礎在中部</h3><p>美國在台協會（AIT）處長谷立言接受專訪特別提到，美方將和台中市長盧秀燕共同推動無人機產業。對此，盧</p><a href="https://www.chinatimes.com/realtimenews/20260624002372-260407" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="TVBS新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">23</span><span class="item-source">TVBS新聞網</span></div><time>06/24 11:23</time></div>
+  <h3>AI&#228;&#188;&#176;&#229;&#188;&#233;&#171;&#232;&#178;&#183;&#231;&#164;&#233;&#232;&#189;&#239;&#188; &#232;&#175;&#231;&#190;&#232;&#161;&#230; &#232;&#183;&#228;&#184;&#231;&#227;&#233;&#232;&#161;&#229;&#229;&#189;&#228;&#184;&#230;&#233;&#232;&#191;&#229;&#184;&#229;&#188;&#231;</h3><p>&#231;&#190;&#232;&#161;&#233;&#177;&#228;&#186;&#229;&#190;&#230;&#173;&#183;&#229;&#178;&#233;&#171;&#233;&#187;&#229;&#162;&#232;&#189;&#239;&#188;&#230;&#230;&#168;&#228;&#188;&#230;&#165;&#173;&#229;</p><a href="https://news.tvbs.com.tw/world/3239230" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="中時新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">26</span><span class="item-source">中時新聞網</span></div><time>06/24 13:02</time></div>
+  <h3>AI需求超乎預期！日月光「面板級封裝」年底量產</h3><p>AI浪潮持續推升全球半導體產業投資熱度，日月光投控營運長吳田玉表示，AI已不再是短期現象，而是驅動未</p><a href="https://www.chinatimes.com/realtimenews/20260624002552-260410" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="TVBS新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">27</span><span class="item-source">TVBS新聞網</span></div><time>06/24 11:00</time></div>
+  <h3>&#229;&#233;&#229; &#172;&#229;&#233;&#171;&#231;&#179;&#187;&#229;&#176;&#229; &#165;AI &#233;&#166;&#229;&#181;&#229;&#188;&#231;&#173;&#232;&#229; &#172;&#230;&#232;&#170;&#229;&#229;</h3><p>&#229;&#229;&#164;&#230;&#165;&#229;&#176;&#230;&#232;&#168;&#180;&#233;&#187;&#232;&#169;&#177;&#239;&#188;&#233;&#229;&#187;&#230;&#175;&#229;&#186;&#229;&#177;&#164;&#229; &#172;&#229;&#229;</p><a href="https://news.tvbs.com.tw/world/3239116" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="AI科技" data-source="Yahoo新聞">
+  <div class="item-top"><div class="item-badges"><span class="item-index">29</span><span class="item-source">Yahoo新聞</span></div><time>06/24 12:59</time></div>
+  <h3>烏克蘭電力巨頭導入AI預測系統 戰火下力保電網穩定</h3><p>烏克蘭主要電力公司 YASNO 宣布，正式部署智慧能源軟體商 Tigo 的 Predict+ AI </p><a href="https://tw.news.yahoo.com/%E7%83%8F%E5%85%8B%E8%98%AD%E9%9B%BB%E5%8A%9B%E5%B7%A8%E9%A0%AD%E5%B0%8E%E5%85%A5ai%E9%A0%90%E6%B8%AC%E7%B3%BB%E7%B5%B1-%E6%88%B0%E7%81%AB%E4%B8%8B%E5%8A%9B%E4%BF%9D%E9%9B%BB%E7%B6%B2%E7%A9%A9%E5%AE%9A-045925931.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article></div></section><section class="category-block" data-category-group="電競遊戲"><div class="section-head"><h2>電競遊戲</h2><span>1 則</span></div><div class="news-grid"><article class="news-item" data-category="電競遊戲" data-source="東森新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">04</span><span class="item-source">東森新聞網</span></div><time>06/24 12:31</time></div>
+  <h3>T1冠軍造型帥氣亮相！Faker六星加里歐、滿滿彩蛋連「石像」都有</h3><p>還記得 2025《英雄聯盟》世界賽的傳奇旅程嗎，經過五場大戰 T1 最終擊敗 KT 建立三連霸王朝，</p><a href="https://game.ettoday.net/article/3188795.htm" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article></div></section><section class="category-block" data-category-group="國際"><div class="section-head"><h2>國際</h2><span>7 則</span></div><div class="news-grid"><article class="news-item" data-category="國際" data-source="Yahoo新聞">
+  <div class="item-top"><div class="item-badges"><span class="item-index">05</span><span class="item-source">Yahoo新聞</span></div><time>06/24 13:03</time></div>
+  <h3>東海大學躍居THE 世界大學影響力全球第85名 全國排名第三僅次台大、陽明交大</h3><p>《圖說》英國泰晤士高等教育（THE）公布2026年最新世界大學影響力排名，東海大學躍升至「全球第85</p><a href="https://tw.news.yahoo.com/%E6%9D%B1%E6%B5%B7%E5%A4%A7%E5%AD%B8%E8%BA%8D%E5%B1%85the-%E4%B8%96%E7%95%8C%E5%A4%A7%E5%AD%B8%E5%BD%B1%E9%9F%BF%E5%8A%9B%E5%85%A8%E7%90%83%E7%AC%AC85%E5%90%8D-%E5%85%A8%E5%9C%8B%E6%8E%92%E5%90%8D%E7%AC%AC%E4%B8%89%E5%83%85%E6%AC%A1%E5%8F%B0%E5%A4%A7-%E9%99%BD%E6%98%8E%E4%BA%A4%E5%A4%A7-050355150.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="國際" data-source="東森新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">16</span><span class="item-source">東森新聞網</span></div><time>06/24 12:23</time></div>
+  <h3>32度高溫遺棄戶外籠 6個月大汪見志工靠近「秒伸掌保護貓同伴」</h3><p>美國印第安那州一間動物收容所人員，近來發現一對遭到遺棄的貓狗組合，2隻小動物被棄置在高溫的停車場戶外</p><a href="https://pets.ettoday.net/news/3188843" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="國際" data-source="Yahoo新聞">
+  <div class="item-top"><div class="item-badges"><span class="item-index">17</span><span class="item-source">Yahoo新聞</span></div><time>06/24 13:00</time></div>
+  <h3>北京觀察》「雷仁勳」的熱乾麵 VS 鏈博會的「鏈接世界」：北京高調談市場開放，為何更像一場供應鏈保衛戰？</h3><p>6月22日，北京迎來第四屆中國國際供應鏈促進博覽會（鏈博會）。中國副總理丁薛祥在開幕式致辭中，針對美</p><a href="https://tw.news.yahoo.com/%E5%8C%97%E4%BA%AC%E8%A7%80%E5%AF%9F-%E9%9B%B7%E4%BB%81%E5%8B%B3-%E7%9A%84%E7%86%B1%E4%B9%BE%E9%BA%B5-vs-%E9%8F%88%E5%8D%9A%E6%9C%83%E7%9A%84-050000148.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="國際" data-source="Yahoo新聞">
+  <div class="item-top"><div class="item-badges"><span class="item-index">21</span><span class="item-source">Yahoo新聞</span></div><time>06/24 12:59</time></div>
+  <h3>喀麥隆家暴問題嚴重 人權觀察批政府消極無作為</h3><p>國際人權組織「人權觀察」最新報告指出，非洲國家喀麥隆針對女性的暴力行為依然猖獗。儘管政府多次承諾改革</p><a href="https://tw.news.yahoo.com/%E5%96%80%E9%BA%A5%E9%9A%86%E5%AE%B6%E6%9A%B4%E5%95%8F%E9%A1%8C%E5%9A%B4%E9%87%8D-%E4%BA%BA%E6%AC%8A%E8%A7%80%E5%AF%9F%E6%89%B9%E6%94%BF%E5%BA%9C%E6%B6%88%E6%A5%B5%E7%84%A1%E4%BD%9C%E7%82%BA-045926165.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="國際" data-source="東森新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">24</span><span class="item-source">東森新聞網</span></div><time>06/24 12:15</time></div>
+  <h3>56歲鄭志偉獻出第一次…興奮合體夢中女神！蔡凡熙新戲被逼成賊頭</h3><p>公視台語台警匪犯罪影集《鎗聲》正式宣佈開鏡，此次台語台首度攜手國際團隊合作，由什一影視與 Imagi</p><a href="https://star.ettoday.net/news/3188864" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="國際" data-source="東森新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">28</span><span class="item-source">東森新聞網</span></div><time>06/24 12:11</time></div>
+  <h3>室外高溫35度！ 美3歲弟遭「獨留車上」活活熱死</h3><p>美國佛州希爾斯波羅郡（Hillsborough County）近日發生一起悲劇，一名3歲男童不明原因</p><a href="https://www.ettoday.net/news/20260624/3188680.htm" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="國際" data-source="中時新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">30</span><span class="item-source">中時新聞網</span></div><time>06/24 13:02</time></div>
+  <h3>巫啟賢憶出道辛酸竟「扮成紅酒瓶」 力挺胡瓜鑽石舞台之夜有原因</h3><p>由胡瓜領軍康康、歐弟、小禎、賴慧如主持的「鑽石舞台之夜」演唱會，中秋連假將在台北國際會議中心登場，其</p><a href="https://www.chinatimes.com/realtimenews/20260624002583-260404" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article></div></section><section class="category-block" data-category-group="財經/證券"><div class="section-head"><h2>財經/證券</h2><span>1 則</span></div><div class="news-grid"><article class="news-item" data-category="財經/證券" data-source="東森新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">12</span><span class="item-source">東森新聞網</span></div><time>06/24 12:23</time></div>
+  <h3>曾虧到寫下「夭壽川普股災」！他3年後曬成果 網喊：這才是我想看到的</h3><p>投資市場起伏劇烈，不少人都曾在股價大跌時懷疑自己的決定。一名網友近日在Dcard發文分享自己的存股成</p><a href="https://finance.ettoday.net/news/3188896" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article></div></section><section class="category-block" data-category-group="政治"><div class="section-head"><h2>政治</h2><span>4 則</span></div><div class="news-grid"><article class="news-item" data-category="政治" data-source="中時新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">14</span><span class="item-source">中時新聞網</span></div><time>06/24 13:08</time></div>
+  <h3>綠2市長參選人合體推銷台南芒果 鼓吹不用靠大陸</h3><p>新北市板橋區農會今（24）日上午舉辦台南芒果推廣活動，民進黨新北市長參選人蘇巧慧、台南市長參選人陳亭</p><a href="https://www.chinatimes.com/realtimenews/20260624002581-260407" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="政治" data-source="中時新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">18</span><span class="item-source">中時新聞網</span></div><time>06/24 13:05</time></div>
+  <h3>持有電子煙政院擬重罰高10萬元 藍委憂查緝只做半套</h3><p>行政院預計在本週院會提出《菸害防制法》修正草案，送立法院審查，草案增訂禁止持有電子煙規定，違者最高可</p><a href="https://www.chinatimes.com/realtimenews/20260624002539-260407" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="政治" data-source="東森新聞網">
+  <div class="item-top"><div class="item-badges"><span class="item-index">20</span><span class="item-source">東森新聞網</span></div><time>06/24 12:20</time></div>
+  <h3>李四川陣營嗆收割三鶯線政績 蘇巧慧：第一時間就感謝新北市府</h3><p>交通部核發新北市捷運三鶯線的營運許可函，民進黨新北市長參選人、立委蘇巧慧昨晚也在臉書分享好消息，遭國</p><a href="https://www.ettoday.net/news/20260624/3188900.htm" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article><article class="news-item" data-category="政治" data-source="Yahoo新聞">
+  <div class="item-top"><div class="item-badges"><span class="item-index">25</span><span class="item-source">Yahoo新聞</span></div><time>06/24 12:59</time></div>
+  <h3>紐約左派初選大勝 民主社會主義崛起恐衝擊國會選情</h3><p>美國紐約市市長 Zohran Mamdani 帶領的「民主社會主義」陣營在民主黨初選中取得重大勝利，</p><a href="https://tw.news.yahoo.com/%E7%B4%90%E7%B4%84%E5%B7%A6%E6%B4%BE%E5%88%9D%E9%81%B8%E5%A4%A7%E5%8B%9D-%E6%B0%91%E4%B8%BB%E7%A4%BE%E6%9C%83%E4%B8%BB%E7%BE%A9%E5%B4%9B%E8%B5%B7%E6%81%90%E8%A1%9D%E6%93%8A%E5%9C%8B%E6%9C%83%E9%81%B8%E6%83%85-044424723.html" target="_blank" rel="noopener noreferrer">開啟原文</a>
+</article></div></section></section>
+    <section class="table-panel"><div class="panel-head"><h2>完整清單</h2><span>想快速掃過全部標題時，可以看這個表格。</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>類別</th><th>來源</th><th>時間</th><th>標題</th><th>摘要</th><th>原文</th></tr></thead><tbody id="newsTableBody"><tr data-category="AI科技"><td class="cell-index">1</td><td>AI科技</td><td>Yahoo新聞</td><td>06/24 13:10</td><td class="cell-title">企業獲利嚴重分歧 台灣5000大企業總營收首破48.5兆元 虧損家數年增逾4成</td><td>全球AI算力需求爆發，帶動5000大企業總體營運向上走揚，根據CRIF中華徵信所今天（24日）公布的</td><td><a href="https://tw.news.yahoo.com/%E4%BC%81%E6%A5%AD%E7%8D%B2%E5%88%A9%E5%9A%B4%E9%87%8D%E5%88%86%E6%AD%A7-%E5%8F%B0%E7%81%A35000%E5%A4%A7%E4%BC%81%E6%A5%AD%E7%B8%BD%E7%87%9F%E6%94%B6%E9%A6%96%E7%A0%B4485%E5%85%86%E5%85%83-%E8%99%A7%E6%90%8D%E5%AE%B6%E6%95%B8%E5%B9%B4%E5%A2%9E%E9%80%BE4%E6%88%90-051042387.html" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">2</td><td>AI科技</td><td>中時新聞網</td><td>06/24 13:11</td><td class="cell-title">白營爆料蘇巧慧胞妹卻意外抓包葛如鈞 范雲酸：還有那些忘了</td><td>民眾黨揭露民進黨新北市長參選人蘇巧慧胞妹蘇巧純擔任「威如科技」旗下akaSwap執行長，未依《公職人</td><td><a href="https://www.chinatimes.com/realtimenews/20260624002442-260407" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">3</td><td>AI科技</td><td>TVBS新聞網</td><td>06/24 12:26</td><td class="cell-title">&#231;&#190; &#229;&#191;&#231;&#165;&#165;&#227;Rain&#227;&#230;&#179;&#176;&#230;&#176;&#229;&#164;&#167;&#229;&#183;&#168;&#232;&#230;&#165;&#229;&#233;&#232;&#182;&#180;&#239;&#188;&#227;&#230;&#168;&#229;&#164;&#169;&#230;&#161;&#231;&#191;&#227;&#232;&#190;&#163;&#229;&#185;&#180;&#231;&#179;&#232;&#182;&#180;&#227;7&#230;&#231;&#187;&#229; &#180;</td><td>&#231;&#182;&#230;&#163;&#231;&#231;&#231;&#177;&#232;&#161;&#231;&#175;&#229;&#165;&#233;&#228;&#184;&#228;&#186;&#230;&#180;&#178;&#233; &#229;&#176;&#231;&#232;&#229;</td><td><a href="https://news.tvbs.com.tw/entertainment/3239287" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="電競遊戲"><td class="cell-index">4</td><td>電競遊戲</td><td>東森新聞網</td><td>06/24 12:31</td><td class="cell-title">T1冠軍造型帥氣亮相！Faker六星加里歐、滿滿彩蛋連「石像」都有</td><td>還記得 2025《英雄聯盟》世界賽的傳奇旅程嗎，經過五場大戰 T1 最終擊敗 KT 建立三連霸王朝，</td><td><a href="https://game.ettoday.net/article/3188795.htm" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="國際"><td class="cell-index">5</td><td>國際</td><td>Yahoo新聞</td><td>06/24 13:03</td><td class="cell-title">東海大學躍居THE 世界大學影響力全球第85名 全國排名第三僅次台大、陽明交大</td><td>《圖說》英國泰晤士高等教育（THE）公布2026年最新世界大學影響力排名，東海大學躍升至「全球第85</td><td><a href="https://tw.news.yahoo.com/%E6%9D%B1%E6%B5%B7%E5%A4%A7%E5%AD%B8%E8%BA%8D%E5%B1%85the-%E4%B8%96%E7%95%8C%E5%A4%A7%E5%AD%B8%E5%BD%B1%E9%9F%BF%E5%8A%9B%E5%85%A8%E7%90%83%E7%AC%AC85%E5%90%8D-%E5%85%A8%E5%9C%8B%E6%8E%92%E5%90%8D%E7%AC%AC%E4%B8%89%E5%83%85%E6%AC%A1%E5%8F%B0%E5%A4%A7-%E9%99%BD%E6%98%8E%E4%BA%A4%E5%A4%A7-050355150.html" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">6</td><td>AI科技</td><td>中時新聞網</td><td>06/24 13:10</td><td class="cell-title">科技股失寵！台塑、台化「驚天漲停」 傳產老大哥們集體復活</td><td>科技股靠邊站，但基期低的非電族群今（24）日成維繫多頭人心的重要焦點，塑膠股今天異軍突起，台塑（13</td><td><a href="https://www.chinatimes.com/realtimenews/20260624002517-260410" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">7</td><td>AI科技</td><td>TVBS新聞網</td><td>06/24 12:17</td><td class="cell-title">&#228;&#184;&#173;&#229;&#232;&#182; &#231;&#180;&#233;&#187;&#232; &#166;&#230; &#228;&#184;&#231;&#190;&#229;&#231;&#187;&#229; &#168;&#231;&#230;&#166;&#233;&#166;&#239;&#188;&#229;&#176;&#229;&#174;&#182;&#239;&#188;&#228;&#184;&#228;&#187;&#163;&#232;&#161;&#168;AI&#229;&#175;&#166;&#229;&#232;&#182; &#232;&#182;</td><td>&#232;&#183;&#175;&#233;&#231;&#164;&#190;&#229;&#188;&#232;&#191;&#176;&#229;&#176;&#229;&#174;&#182;&#232;&#170;&#170;&#230;&#179;&#229; &#177;&#229;&#176;&#239;&#188;&#228;&#184;&#173;&#229;&#229;&#168;&#229; &#168;&#231;</td><td><a href="https://news.tvbs.com.tw/world/3239155" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">8</td><td>AI科技</td><td>東森新聞網</td><td>06/24 12:27</td><td class="cell-title">巴黎男裝周／Cortis趙雨凡、馬丁雙帥看秀！Saint Laurent把克制變最高級性感</td><td>COER們終於等到了！男團Cortis成員趙雨凡（James）與隊長馬丁（Martin）出席巴黎男裝</td><td><a href="https://fashion.ettoday.net/news/3188891" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">9</td><td>AI科技</td><td>Yahoo新聞</td><td>06/24 13:01</td><td class="cell-title">鳳梨釋迦銷陸是「養套殺」？沈政男搬數據打臉綠營：美國對台晶片不也是？</td><td>陸委會副主委梁文傑日前指出，台灣人幾乎不吃鳳梨釋迦，高達9成產量出口中國市場，並形容該作物「完全要仰</td><td><a href="https://tw.news.yahoo.com/%E9%B3%B3%E6%A2%A8%E9%87%8B%E8%BF%A6%E9%8A%B7%E9%99%B8%E6%98%AF-%E9%A4%8A%E5%A5%97%E6%AE%BA-%E6%B2%88%E6%94%BF%E7%94%B7%E6%90%AC%E6%95%B8%E6%93%9A%E6%89%93%E8%87%89%E7%B6%A0%E7%87%9F-%E7%BE%8E%E5%9C%8B%E5%B0%8D%E5%8F%B0%E6%99%B6%E7%89%87%E4%B8%8D%E4%B9%9F%E6%98%AF-050147475.html" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">10</td><td>AI科技</td><td>中時新聞網</td><td>06/24 13:09</td><td class="cell-title">中職》羅志祥、RAIN、泰民台韓舞王接力 跳翻桃猿辣年糕趴</td><td>中華職棒上季總冠軍樂天桃猿在2026賽季的年度指標活動「辣年糕趴」，今年移師台北大巨蛋，7月24日到</td><td><a href="https://www.chinatimes.com/realtimenews/20260624002610-260403" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">11</td><td>AI科技</td><td>TVBS新聞網</td><td>06/24 12:12</td><td class="cell-title">&#230;&#230;&#167;AI&#230;&#228;&#187;&#163;&#229;&#189;&#232;&#239;&#188;&#227;&#231;&#189;&#231;&#228;&#184;&#227;&#229;&#179;&#176;&#230;&#232;&#175;&#229;&#186;&#230;&#173;&#229;&#185;&#227;&#231;&#190;&#228;&#184;&#173;&#232;&#183;&#230;&#182;&#231;&#230;&#176;&#230;&#176;&#232;&#174;&#229;&#177;</td><td>&#231;&#190;&#228;&#184;&#173;&#232;&#183;&#229;&#229;&#176;&#233;&#171;&#232;&#167;&#229;&#229;&#231;&#180;&#239;&#188;&#232;&#183;&#232;&#173;&#230;&#172;&#233;&#177;&#230;&#173;&#163;&#229;&#188;</td><td><a href="https://news.tvbs.com.tw/tech/3239206" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="財經/證券"><td class="cell-index">12</td><td>財經/證券</td><td>東森新聞網</td><td>06/24 12:23</td><td class="cell-title">曾虧到寫下「夭壽川普股災」！他3年後曬成果 網喊：這才是我想看到的</td><td>投資市場起伏劇烈，不少人都曾在股價大跌時懷疑自己的決定。一名網友近日在Dcard發文分享自己的存股成</td><td><a href="https://finance.ettoday.net/news/3188896" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">13</td><td>AI科技</td><td>Yahoo新聞</td><td>06/24 13:01</td><td class="cell-title">洋基女孩一暄化身「最正數學老師」！政大高材生親授3招讀書秘訣</td><td>洋基工程啦啦隊「洋基女孩」全新YouTube頻道《洋基女孩ON AIR》持續推出新企劃，第三集找來政</td><td><a href="https://tw.news.yahoo.com/%E6%B4%8B%E5%9F%BA%E5%A5%B3%E5%AD%A9-%E6%9A%84%E5%8C%96%E8%BA%AB-%E6%9C%80%E6%AD%A3%E6%95%B8%E5%AD%B8%E8%80%81%E5%B8%AB-%E6%94%BF%E5%A4%A7%E9%AB%98%E6%9D%90%E7%94%9F%E8%A6%AA%E6%8E%883%E6%8B%9B%E8%AE%80%E6%9B%B8%E7%A7%98%E8%A8%A3-050100197.html" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="政治"><td class="cell-index">14</td><td>政治</td><td>中時新聞網</td><td>06/24 13:08</td><td class="cell-title">綠2市長參選人合體推銷台南芒果 鼓吹不用靠大陸</td><td>新北市板橋區農會今（24）日上午舉辦台南芒果推廣活動，民進黨新北市長參選人蘇巧慧、台南市長參選人陳亭</td><td><a href="https://www.chinatimes.com/realtimenews/20260624002581-260407" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">15</td><td>AI科技</td><td>TVBS新聞網</td><td>06/24 12:12</td><td class="cell-title">&#232;&#183;&#232;&#173;&#232;&#179;&#170;&#231;&#231;&#190;&#229;&#230;&#182;&#231;&#231;&#174;&#161;&#229;&#182;&#230;&#179;&#230;&#161;&#227;&#228;&#187;&#229; &#229; &#165;AI&#228;&#190;&#230;&#233;&#232;&#175;&#231;Pax Silica</td><td>&#232;&#183;&#232;&#173;&#232;&#191;&#230;&#165;&#229;&#176;&#231;&#190;&#229;&#230;&#168;&#229;&#231;&#227;MATCH Act&#227;&#232;&#161;&#168;&#233;</td><td><a href="https://news.tvbs.com.tw/tech/3239202" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="國際"><td class="cell-index">16</td><td>國際</td><td>東森新聞網</td><td>06/24 12:23</td><td class="cell-title">32度高溫遺棄戶外籠 6個月大汪見志工靠近「秒伸掌保護貓同伴」</td><td>美國印第安那州一間動物收容所人員，近來發現一對遭到遺棄的貓狗組合，2隻小動物被棄置在高溫的停車場戶外</td><td><a href="https://pets.ettoday.net/news/3188843" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="國際"><td class="cell-index">17</td><td>國際</td><td>Yahoo新聞</td><td>06/24 13:00</td><td class="cell-title">北京觀察》「雷仁勳」的熱乾麵 VS 鏈博會的「鏈接世界」：北京高調談市場開放，為何更像一場供應鏈保衛戰？</td><td>6月22日，北京迎來第四屆中國國際供應鏈促進博覽會（鏈博會）。中國副總理丁薛祥在開幕式致辭中，針對美</td><td><a href="https://tw.news.yahoo.com/%E5%8C%97%E4%BA%AC%E8%A7%80%E5%AF%9F-%E9%9B%B7%E4%BB%81%E5%8B%B3-%E7%9A%84%E7%86%B1%E4%B9%BE%E9%BA%B5-vs-%E9%8F%88%E5%8D%9A%E6%9C%83%E7%9A%84-050000148.html" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="政治"><td class="cell-index">18</td><td>政治</td><td>中時新聞網</td><td>06/24 13:05</td><td class="cell-title">持有電子煙政院擬重罰高10萬元 藍委憂查緝只做半套</td><td>行政院預計在本週院會提出《菸害防制法》修正草案，送立法院審查，草案增訂禁止持有電子煙規定，違者最高可</td><td><a href="https://www.chinatimes.com/realtimenews/20260624002539-260407" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">19</td><td>AI科技</td><td>TVBS新聞網</td><td>06/24 12:03</td><td class="cell-title">AI&#231;&#230;&#189;&#174;&#229;&#185;&#230;&#179;&#161;&#230;&#179;&#161;&#239;&#188;&#231;&#190;&#229; &#233;&#173;&#232;&#161;&#230;&#180;&#231;&#231;13%&#227;&#229;&#176;&#229;&#174;&#182;&#230;&#173;&#232;&#229;&#190;&#232;&#180;&#229;&#189;&#229; &#167;&#229;&#185;</td><td>&#229; &#168;&#231;&#232;&#168;&#230;&#182;&#233;&#171;&#230;&#182;&#231;&#230;&#231;&#190;&#164;23&#230;&#165;&#233;&#173;&#233;&#233;&#230;&#171;&#239;&#188;&#231;&#190;</td><td><a href="https://news.tvbs.com.tw/world/3239232" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="政治"><td class="cell-index">20</td><td>政治</td><td>東森新聞網</td><td>06/24 12:20</td><td class="cell-title">李四川陣營嗆收割三鶯線政績 蘇巧慧：第一時間就感謝新北市府</td><td>交通部核發新北市捷運三鶯線的營運許可函，民進黨新北市長參選人、立委蘇巧慧昨晚也在臉書分享好消息，遭國</td><td><a href="https://www.ettoday.net/news/20260624/3188900.htm" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="國際"><td class="cell-index">21</td><td>國際</td><td>Yahoo新聞</td><td>06/24 12:59</td><td class="cell-title">喀麥隆家暴問題嚴重 人權觀察批政府消極無作為</td><td>國際人權組織「人權觀察」最新報告指出，非洲國家喀麥隆針對女性的暴力行為依然猖獗。儘管政府多次承諾改革</td><td><a href="https://tw.news.yahoo.com/%E5%96%80%E9%BA%A5%E9%9A%86%E5%AE%B6%E6%9A%B4%E5%95%8F%E9%A1%8C%E5%9A%B4%E9%87%8D-%E4%BA%BA%E6%AC%8A%E8%A7%80%E5%AF%9F%E6%89%B9%E6%94%BF%E5%BA%9C%E6%B6%88%E6%A5%B5%E7%84%A1%E4%BD%9C%E7%82%BA-045926165.html" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">22</td><td>AI科技</td><td>中時新聞網</td><td>06/24 13:04</td><td class="cell-title">影》AIT與中市府合作無人機 盧秀燕：4大發展基礎在中部</td><td>美國在台協會（AIT）處長谷立言接受專訪特別提到，美方將和台中市長盧秀燕共同推動無人機產業。對此，盧</td><td><a href="https://www.chinatimes.com/realtimenews/20260624002372-260407" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">23</td><td>AI科技</td><td>TVBS新聞網</td><td>06/24 11:23</td><td class="cell-title">AI&#228;&#188;&#176;&#229;&#188;&#233;&#171;&#232;&#178;&#183;&#231;&#164;&#233;&#232;&#189;&#239;&#188; &#232;&#175;&#231;&#190;&#232;&#161;&#230; &#232;&#183;&#228;&#184;&#231;&#227;&#233;&#232;&#161;&#229;&#229;&#189;&#228;&#184;&#230;&#233;&#232;&#191;&#229;&#184;&#229;&#188;&#231;</td><td>&#231;&#190;&#232;&#161;&#233;&#177;&#228;&#186;&#229;&#190;&#230;&#173;&#183;&#229;&#178;&#233;&#171;&#233;&#187;&#229;&#162;&#232;&#189;&#239;&#188;&#230;&#230;&#168;&#228;&#188;&#230;&#165;&#173;&#229;</td><td><a href="https://news.tvbs.com.tw/world/3239230" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="國際"><td class="cell-index">24</td><td>國際</td><td>東森新聞網</td><td>06/24 12:15</td><td class="cell-title">56歲鄭志偉獻出第一次…興奮合體夢中女神！蔡凡熙新戲被逼成賊頭</td><td>公視台語台警匪犯罪影集《鎗聲》正式宣佈開鏡，此次台語台首度攜手國際團隊合作，由什一影視與 Imagi</td><td><a href="https://star.ettoday.net/news/3188864" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="政治"><td class="cell-index">25</td><td>政治</td><td>Yahoo新聞</td><td>06/24 12:59</td><td class="cell-title">紐約左派初選大勝 民主社會主義崛起恐衝擊國會選情</td><td>美國紐約市市長 Zohran Mamdani 帶領的「民主社會主義」陣營在民主黨初選中取得重大勝利，</td><td><a href="https://tw.news.yahoo.com/%E7%B4%90%E7%B4%84%E5%B7%A6%E6%B4%BE%E5%88%9D%E9%81%B8%E5%A4%A7%E5%8B%9D-%E6%B0%91%E4%B8%BB%E7%A4%BE%E6%9C%83%E4%B8%BB%E7%BE%A9%E5%B4%9B%E8%B5%B7%E6%81%90%E8%A1%9D%E6%93%8A%E5%9C%8B%E6%9C%83%E9%81%B8%E6%83%85-044424723.html" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">26</td><td>AI科技</td><td>中時新聞網</td><td>06/24 13:02</td><td class="cell-title">AI需求超乎預期！日月光「面板級封裝」年底量產</td><td>AI浪潮持續推升全球半導體產業投資熱度，日月光投控營運長吳田玉表示，AI已不再是短期現象，而是驅動未</td><td><a href="https://www.chinatimes.com/realtimenews/20260624002552-260410" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">27</td><td>AI科技</td><td>TVBS新聞網</td><td>06/24 11:00</td><td class="cell-title">&#229;&#233;&#229; &#172;&#229;&#233;&#171;&#231;&#179;&#187;&#229;&#176;&#229; &#165;AI &#233;&#166;&#229;&#181;&#229;&#188;&#231;&#173;&#232;&#229; &#172;&#230;&#232;&#170;&#229;&#229;</td><td>&#229;&#229;&#164;&#230;&#165;&#229;&#176;&#230;&#232;&#168;&#180;&#233;&#187;&#232;&#169;&#177;&#239;&#188;&#233;&#229;&#187;&#230;&#175;&#229;&#186;&#229;&#177;&#164;&#229; &#172;&#229;&#229;</td><td><a href="https://news.tvbs.com.tw/world/3239116" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="國際"><td class="cell-index">28</td><td>國際</td><td>東森新聞網</td><td>06/24 12:11</td><td class="cell-title">室外高溫35度！ 美3歲弟遭「獨留車上」活活熱死</td><td>美國佛州希爾斯波羅郡（Hillsborough County）近日發生一起悲劇，一名3歲男童不明原因</td><td><a href="https://www.ettoday.net/news/20260624/3188680.htm" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="AI科技"><td class="cell-index">29</td><td>AI科技</td><td>Yahoo新聞</td><td>06/24 12:59</td><td class="cell-title">烏克蘭電力巨頭導入AI預測系統 戰火下力保電網穩定</td><td>烏克蘭主要電力公司 YASNO 宣布，正式部署智慧能源軟體商 Tigo 的 Predict+ AI </td><td><a href="https://tw.news.yahoo.com/%E7%83%8F%E5%85%8B%E8%98%AD%E9%9B%BB%E5%8A%9B%E5%B7%A8%E9%A0%AD%E5%B0%8E%E5%85%A5ai%E9%A0%90%E6%B8%AC%E7%B3%BB%E7%B5%B1-%E6%88%B0%E7%81%AB%E4%B8%8B%E5%8A%9B%E4%BF%9D%E9%9B%BB%E7%B6%B2%E7%A9%A9%E5%AE%9A-045925931.html" target="_blank" rel="noopener noreferrer">原文</a></td></tr><tr data-category="國際"><td class="cell-index">30</td><td>國際</td><td>中時新聞網</td><td>06/24 13:02</td><td class="cell-title">巫啟賢憶出道辛酸竟「扮成紅酒瓶」 力挺胡瓜鑽石舞台之夜有原因</td><td>由胡瓜領軍康康、歐弟、小禎、賴慧如主持的「鑽石舞台之夜」演唱會，中秋連假將在台北國際會議中心登場，其</td><td><a href="https://www.chinatimes.com/realtimenews/20260624002583-260404" target="_blank" rel="noopener noreferrer">原文</a></td></tr></tbody></table></div></section>
     <p class="footer-note">這是本機 HTML 檔，直接雙擊就能在瀏覽器開啟；之後每次排程都會覆蓋同一份檔案。</p>
   </main>
-
-  <script id="newsData" type="application/json">[{&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;06/24 01:43&quot;, &quot;title&quot;: &quot;真主黨要求以色列限期撤軍 黎巴嫩邊境再傳槍響奪2命&quot;, &quot;summary&quot;: &quot;黎巴嫩真主黨（Hezbollah）領袖 Naim Qassem 要求以色列軍隊必須依循時間表，完全撤&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/%E7%9C%9F%E4%B8%BB%E9%BB%A8%E8%A6%81%E6%B1%82%E4%BB%A5%E8%89%B2%E5%88%97%E9%99%90%E6%9C%9F%E6%92%A4%E8%BB%8D-%E9%BB%8E%E5%B7%B4%E5%AB%A9%E9%82%8A%E5%A2%83%E5%86%8D%E5%82%B3%E6%A7%8D%E9%9F%BF%E5%A5%AA2%E5%91%BD-172834809.html&quot;, &quot;id&quot;: 1}, {&quot;category&quot;: &quot;政治&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;06/24 01:43&quot;, &quot;title&quot;: &quot;尚比亞前總統遺體爭奪戰 南非法院判決家屬勝訴&quot;, &quot;summary&quot;: &quot;尚比亞前總統 Edgar Lungu 逝世一年多卻因政治恩怨無法入土。南非最高上訴法院週二做出關鍵判&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/%E5%B0%9A%E6%AF%94%E4%BA%9E%E5%89%8D%E7%B8%BD%E7%B5%B1%E9%81%BA%E9%AB%94%E7%88%AD%E5%A5%AA%E6%88%B0-%E5%8D%97%E9%9D%9E%E6%B3%95%E9%99%A2%E5%88%A4%E6%B1%BA%E5%AE%B6%E5%B1%AC%E5%8B%9D%E8%A8%B4-174335712.html&quot;, &quot;id&quot;: 2}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;06/24 01:43&quot;, &quot;title&quot;: &quot;國際資料公司AI平台問世 科技情報可驗證加速決策&quot;, &quot;summary&quot;: &quot;商傳媒｜責任編輯／綜合外電報導國際資料公司（IDC）近日推出其人工智慧平台 IDC Quanta，旨&quot;, &quot;url&quot;: &quot;https://tw.stock.yahoo.com/news/%E5%9C%8B%E9%9A%9B%E8%B3%87%E6%96%99%E5%85%AC%E5%8F%B8ai%E5%B9%B3%E5%8F%B0%E5%95%8F%E4%B8%96-%E7%A7%91%E6%8A%80%E6%83%85%E5%A0%B1%E5%8F%AF%E9%A9%97%E8%AD%89%E5%8A%A0%E9%80%9F%E6%B1%BA%E7%AD%96-174336724.html&quot;, &quot;id&quot;: 3}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;06/24 01:32&quot;, &quot;title&quot;: &quot;沖繩美軍部署新銳反艦、防空系統 強化嚇阻&quot;, &quot;summary&quot;: &quot;記者丘學陞／綜合報導 日本「共同社」22日報導，駐沖繩美軍陸戰隊日前已正式部署「海軍／陸戰隊遠征艦隊&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/%E6%B2%96%E7%B9%A9%E7%BE%8E%E8%BB%8D%E9%83%A8%E7%BD%B2%E6%96%B0%E9%8A%B3%E5%8F%8D%E8%89%A6-%E9%98%B2%E7%A9%BA%E7%B3%BB%E7%B5%B1-%E5%BC%B7%E5%8C%96%E5%9A%87%E9%98%BB-173200875.html&quot;, &quot;id&quot;: 4}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;06/24 01:31&quot;, &quot;title&quot;: &quot;五眼聯盟：AI將升級網攻 籲加強資安防禦&quot;, &quot;summary&quot;: &quot;記者廖子杰／綜合報導 由美、英、加、澳、紐組成的「五眼聯盟」（Five Eyes）22日警告，持續發&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/%E4%BA%94%E7%9C%BC%E8%81%AF%E7%9B%9F-ai%E5%B0%87%E5%8D%87%E7%B4%9A%E7%B6%B2%E6%94%BB-%E7%B1%B2%E5%8A%A0%E5%BC%B7%E8%B3%87%E5%AE%89%E9%98%B2%E7%A6%A6-173100572.html&quot;, &quot;id&quot;: 5}, {&quot;category&quot;: &quot;政治&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;06/24 01:30&quot;, &quot;title&quot;: &quot;【戰略快評】「中」試探民主友盟安全承諾 升高地緣政治風險&quot;, &quot;summary&quot;: &quot;◎汪哲仁 隨著5月北京「川習會」落幕，臺灣在白宮的會後聲明與事實清單中雙雙缺席。美國總統川普透露曾與&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/%E6%88%B0%E7%95%A5%E5%BF%AB%E8%A9%95-%E4%B8%AD-%E8%A9%A6%E6%8E%A2%E6%B0%91%E4%B8%BB%E5%8F%8B%E7%9B%9F%E5%AE%89%E5%85%A8%E6%89%BF%E8%AB%BE-%E5%8D%87%E9%AB%98%E5%9C%B0%E7%B7%A3%E6%94%BF%E6%B2%BB%E9%A2%A8%E9%9A%AA-173000167.html&quot;, &quot;id&quot;: 6}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;06/24 01:21&quot;, &quot;title&quot;: &quot;美伊達成協議 國際海事組織將撤離滯留波灣船員&quot;, &quot;summary&quot;: &quot;（中央社倫敦23日綜合外電報導）聯合國機構國際海事組織（International Maritime&quot;, &quot;url&quot;: &quot;https://tw.news.yahoo.com/%E7%BE%8E%E4%BC%8A%E9%81%94%E6%88%90%E5%8D%94%E8%AD%B0-%E5%9C%8B%E9%9A%9B%E6%B5%B7%E4%BA%8B%E7%B5%84%E7%B9%94%E5%B0%87%E6%92%A4%E9%9B%A2%E6%BB%AF%E7%95%99%E6%B3%A2%E7%81%A3%E8%88%B9%E5%93%A1-172119071.html&quot;, &quot;id&quot;: 7}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;Yahoo新聞&quot;, &quot;time&quot;: &quot;06/24 01:20&quot;, &quot;title&quot;: &quot;西班牙躍升歐洲投資重鎮 科技生醫與基礎設施受跨國企業青睞&quot;, &quot;summary&quot;: &quot;圖／示意圖商傳媒｜葉安庭／綜合外電報導西班牙正逐步成為歐洲最具吸引力的投資、創新與國際拓展目的地，其&quot;, &quot;url&quot;: &quot;https://tw.stock.yahoo.com/news/%E8%A5%BF%E7%8F%AD%E7%89%99%E8%BA%8D%E5%8D%87%E6%AD%90%E6%B4%B2%E6%8A%95%E8%B3%87%E9%87%8D%E9%8E%AE-%E7%A7%91%E6%8A%80%E7%94%9F%E9%86%AB%E8%88%87%E5%9F%BA%E7%A4%8E%E8%A8%AD%E6%96%BD%E5%8F%97%E8%B7%A8%E5%9C%8B%E4%BC%81%E6%A5%AD%E9%9D%92%E7%9D%9E-172015981.html&quot;, &quot;id&quot;: 8}, {&quot;category&quot;: &quot;財經/證券&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;06/24 01:00&quot;, &quot;title&quot;: &quot;卡刷爆也要顧面子！4星座最愛「花錢撐場面」 帳戶餘額超悲劇&quot;, &quot;summary&quot;: &quot;有些人花錢是為了讓自己開心，有些人則是為了投資未來，但還有一種人，花錢最大的原因竟然是「不想輸」。明&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/life/3233481&quot;, &quot;id&quot;: 9}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;東森新聞網&quot;, &quot;time&quot;: &quot;06/24 00:25&quot;, &quot;title&quot;: &quot;米克拉強撲日本「雙颱夾擊」狂灌雨 專家警告：2地長時間豪雨&quot;, &quot;summary&quot;: &quot;太平洋雙颱都往日本去？日本周邊海域進入雙颱風發展階段，日本氣象廳表示， 7號中颱「米克拉」持續維持強&quot;, &quot;url&quot;: &quot;https://www.ettoday.net/news/20260624/3188581.htm&quot;, &quot;id&quot;: 10}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;06/24 00:21&quot;, &quot;title&quot;: &quot;誤以為老化或壓力大 癌症專家點名5常見危險徵兆&quot;, &quot;summary&quot;: &quot;隨著年齡增長，人體難免會出現疼痛與不適，但並非所有症狀皆因老化而起，有時可能是嚴重疾病的徵兆，例如癌&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260624000064-260408&quot;, &quot;id&quot;: 11}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;06/24 00:17&quot;, &quot;title&quot;: &quot;加拿大重啟CANDU 重水反應爐外銷 搶攻全球核能復興商機&quot;, &quot;summary&quot;: &quot;加拿大政府日前公布新的國家核能戰略，宣布未來15年內將新建最多10座核反應爐、擴大鈾出口並推動小型模&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260624000065-260408&quot;, &quot;id&quot;: 12}, {&quot;category&quot;: &quot;電競遊戲&quot;, &quot;source&quot;: &quot;東森新聞網&quot;, &quot;time&quot;: &quot;06/24 00:08&quot;, &quot;title&quot;: &quot;使用AI恐影響遊戲評價 研究揭評論數少50%...負面觀感成關鍵&quot;, &quot;summary&quot;: &quot;隨著生成式 AI 與聊天機器人技術快速發展，遊戲產業近年持續圍繞其應用價值展開討論，若從市場表現角度&quot;, &quot;url&quot;: &quot;https://game.ettoday.net/article/3188559.htm&quot;, &quot;id&quot;: 13}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;06/23 23:49&quot;, &quot;title&quot;: &quot;日本「梅雨+雙颱」夾擊！氣象廳示警：豪雨警戒升級&quot;, &quot;summary&quot;: &quot;日本氣象廳表示，第8號颱風無花果今天上午正式生成，20日生成的第7號颱風米克拉則已發展為強烈颱風，預&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/world/3238964&quot;, &quot;id&quot;: 14}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;東森新聞網&quot;, &quot;time&quot;: &quot;06/23 23:43&quot;, &quot;title&quot;: &quot;新書揭馬斯克憂中國侵台衝擊晶片供應 曾向川普示警&quot;, &quot;summary&quot;: &quot;一本聚焦美國總統川普第2個總統任期的新書於今天出版，根據書中內容，馬斯克去年在白宮一場科技業高層會議&quot;, &quot;url&quot;: &quot;https://www.ettoday.net/news/20260623/3188548.htm&quot;, &quot;id&quot;: 15}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;06/23 23:35&quot;, &quot;title&quot;: &quot;市場樂觀過頭！ 華爾街老將喊美股恐回檔20％ 發6大警訊&quot;, &quot;summary&quot;: &quot;在AI題材持續發酵帶動下，美股今年以來維持強勢表現，標普500指數屢創歷史新高。不過，長期看多股市的&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260623004650-260410&quot;, &quot;id&quot;: 16}, {&quot;category&quot;: &quot;政治&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;06/23 23:33&quot;, &quot;title&quot;: &quot;影音／光復洪災陰影！花蓮萬里溪有堰塞湖 居民備戰&quot;, &quot;summary&quot;: &quot;颱風米克拉逼台！萬里溪「600萬噸堰塞湖」拉警報 季連成示警：最快10天溢流 颱風米克拉逐步逼近台灣&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/politics/3238912&quot;, &quot;id&quot;: 17}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;06/23 23:30&quot;, &quot;title&quot;: &quot;影》神獵技！澳洲新品種蜘蛛編織「超彈力陷阱」捕天敵&quot;, &quot;summary&quot;: &quot;澳洲學界最近在北部熱帶雨林深處發現新品種蜘蛛具備令人驚嘆的獵捕技能，牠們吐絲製作精密的彈弓式陷阱，專&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260623004596-260408&quot;, &quot;id&quot;: 18}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;06/23 23:21&quot;, &quot;title&quot;: &quot;影音／3階段自駕公車計畫！ 蔣萬安：明年開放民眾試乘&quot;, &quot;summary&quot;: &quot;台北市長蔣萬安今（23）日在市政會議正式宣布，台北市自駕公車將分成三階段推動，今年第三季預計先在台北&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/politics/3238694&quot;, &quot;id&quot;: 19}, {&quot;category&quot;: &quot;政治&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;06/23 23:17&quot;, &quot;title&quot;: &quot;影音／臉呢？法籍男破壞鍾沛君看板 稱有創作價值&quot;, &quot;summary&quot;: &quot;國民黨台北市議員鍾沛君的選舉看板近日驚傳遭到破壞，看板上議員的雙眼與面容竟被人整齊割下「挖空」。警方&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/politics/3238789&quot;, &quot;id&quot;: 20}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;06/23 23:15&quot;, &quot;title&quot;: &quot;21歲女星淚訴被迫剃頭道歉！因私約粉絲成AKB48首例開除&quot;, &quot;summary&quot;: &quot;日本偶像天團AKB48日前拋出震撼彈，成軍21年來首度開鍘「解約」重罰，對象是21歲的19期生花田藍&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260623004607-260404&quot;, &quot;id&quot;: 21}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;東森新聞網&quot;, &quot;time&quot;: &quot;06/23 23:09&quot;, &quot;title&quot;: &quot;神戶「冷凍屍案」震撼日本！男遭肢解上下身藏15年 前妻涉嫌被逮&quot;, &quot;summary&quot;: &quot;日本神戶市中央區近日爆出一起震驚社會的公寓藏屍案，警方本月在住處冷凍庫內發現遭肢解男性遺體後，於23&quot;, &quot;url&quot;: &quot;https://www.ettoday.net/news/20260623/3188571.htm&quot;, &quot;id&quot;: 22}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;06/23 23:09&quot;, &quot;title&quot;: &quot;《無名之輩》AI短劇線上看結局！救世主西恩介紹&amp;全集免費看攻略&quot;, &quot;summary&quot;: &quot;AI短劇《無名之輩》正在熱播！本文帶劇迷掌握短劇線上看免費全集攻略，並解析劇情亮點與男主角救世主西恩&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/entertainment/3238968&quot;, &quot;id&quot;: 23}, {&quot;category&quot;: &quot;財經/證券&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;06/23 23:05&quot;, &quot;title&quot;: &quot;大樂透頭獎13連槓 下期上看4億 端午加碼百萬開出6組&quot;, &quot;summary&quot;: &quot;大樂透23日晚間開獎，頭獎再度槓龜，台灣彩券表示，大樂透頭獎已連續13期槓龜，預估下期銷售金額2至2&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260623004599-260410&quot;, &quot;id&quot;: 24}, {&quot;category&quot;: &quot;AI科技&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;06/23 23:03&quot;, &quot;title&quot;: &quot;韓國槓桿型ETF助漲助跌 加劇晶片權值股價格波動&quot;, &quot;summary&quot;: &quot;在AI熱潮驅動下，韓國記憶體巨頭SK海力士與三星電子股價大幅攀升，追蹤兩家晶片巨頭的槓桿型單股ETF&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260623004511-260410&quot;, &quot;id&quot;: 25}, {&quot;category&quot;: &quot;財經/證券&quot;, &quot;source&quot;: &quot;TVBS新聞網&quot;, &quot;time&quot;: &quot;06/23 23:03&quot;, &quot;title&quot;: &quot;踩利害關係人投資紅線！郭明鑑辭國泰董事 金管會下令清查&quot;, &quot;summary&quot;: &quot;國泰投信昨天公告郭明鑑辭任董事，外界關注他是否有擔任其他上市公司董事但未申報，導致國泰投信可能違規投&quot;, &quot;url&quot;: &quot;https://news.tvbs.com.tw/life/3238891&quot;, &quot;id&quot;: 26}, {&quot;category&quot;: &quot;財經/證券&quot;, &quot;source&quot;: &quot;中時新聞網&quot;, &quot;time&quot;: &quot;06/23 23:01&quot;, &quot;title&quot;: &quot;平愛梨帶4子現身世界盃挺國腳老公 配音《哆啦A夢》意外治好小孩賴床&quot;, &quot;summary&quot;: &quot;蟬聯日本票房6週冠軍、累計動員超過334萬人次、票房突破42億日圓的《電影哆啦A夢：新‧大雄的海底鬼&quot;, &quot;url&quot;: &quot;https://www.chinatimes.com/realtimenews/20260623004433-260404&quot;, &quot;id&quot;: 27}, {&quot;category&quot;: &quot;政治&quot;, &quot;source&quot;: &quot;東森新聞網&quot;, &quot;time&quot;: &quot;06/23 23:00&quot;, &quot;title&quot;: &quot;沒有革命的斷頭臺 施凱爾與一個失去方向的帝國&quot;, &quot;summary&quot;: &quot;1986年的諾貝爾和平獎得主埃利．維瑟爾 (Elie Wiesel) 有一段廣為流傳的警語：「愛的反&quot;, &quot;url&quot;: &quot;https://forum.ettoday.net/news/3188237&quot;, &quot;id&quot;: 28}, {&quot;category&quot;: &quot;政治&quot;, &quot;source&quot;: &quot;東森新聞網&quot;, &quot;time&quot;: &quot;06/23 22:19&quot;, &quot;title&quot;: &quot;德黑蘭否認同意IAEA核查 川普堅稱伊朗同意：否則談判就不會繼續&quot;, &quot;summary&quot;: &quot;美國財政部長貝森特（Scott Bessent）22日表示，伊朗已同意國際原子能總署（IAEA）人員&quot;, &quot;url&quot;: &quot;https://www.ettoday.net/news/20260623/3188564.htm&quot;, &quot;id&quot;: 29}, {&quot;category&quot;: &quot;國際&quot;, &quot;source&quot;: &quot;東森新聞網&quot;, &quot;time&quot;: &quot;06/23 22:07&quot;, &quot;title&quot;: &quot;94歲音樂教父離世！ 王力宏悲痛發聲「難忘他1事」：大開眼界&quot;, &quot;summary&quot;: &quot;美國樂壇傳奇製作人、被譽為「流行音樂教父」的Clive Davis日前辭世，享耆壽94歲，曾受他提攜&quot;, &quot;url&quot;: &quot;https://star.ettoday.net/news/3188560&quot;, &quot;id&quot;: 30}]</script>
   <script>
     const state = { keyword: "", category: "全部" };
     const filterRow = document.getElementById("filterRow");
@@ -1323,58 +150,18 @@
     const leadCards = Array.from(document.querySelectorAll(".lead-card"));
     const groups = Array.from(document.querySelectorAll("[data-category-group]"));
     const emptyState = document.getElementById("emptyState");
-
-    function textMatch(node, keyword) {
-      if (!keyword) return true;
-      return node.textContent.toLowerCase().includes(keyword);
-    }
-
-    function categoryMatch(category) {
-      return state.category === "全部" || category === state.category;
-    }
-
+    function textMatch(node, keyword) { return !keyword || node.textContent.toLowerCase().includes(keyword); }
+    function categoryMatch(category) { return state.category === "全部" || category === state.category; }
     function applyFilters() {
-      const keyword = state.keyword.trim().toLowerCase();
-      let visibleCount = 0;
-
-      cards.forEach((card) => {
-        const ok = categoryMatch(card.dataset.category) && textMatch(card, keyword);
-        card.classList.toggle("hidden", !ok);
-        if (ok) visibleCount += 1;
-      });
-
-      groups.forEach((group) => {
-        const category = group.dataset.categoryGroup;
-        const hasVisible = Array.from(group.querySelectorAll(".news-item")).some((card) => !card.classList.contains("hidden"));
-        group.classList.toggle("hidden", !categoryMatch(category) || !hasVisible);
-      });
-
-      tableRows.forEach((row) => {
-        const ok = categoryMatch(row.dataset.category) && textMatch(row, keyword);
-        row.classList.toggle("hidden", !ok);
-      });
-
-      leadCards.forEach((card) => {
-        const ok = categoryMatch(card.dataset.category) && textMatch(card, keyword);
-        card.classList.toggle("hidden", !ok);
-      });
-
+      const keyword = state.keyword.trim().toLowerCase(); let visibleCount = 0;
+      cards.forEach((card) => { const ok = categoryMatch(card.dataset.category) && textMatch(card, keyword); card.classList.toggle("hidden", !ok); if (ok) visibleCount += 1; });
+      groups.forEach((group) => { const hasVisible = Array.from(group.querySelectorAll(".news-item")).some((card) => !card.classList.contains("hidden")); group.classList.toggle("hidden", !categoryMatch(group.dataset.categoryGroup) || !hasVisible); });
+      tableRows.forEach((row) => { row.classList.toggle("hidden", !(categoryMatch(row.dataset.category) && textMatch(row, keyword))); });
+      leadCards.forEach((card) => { card.classList.toggle("hidden", !(categoryMatch(card.dataset.category) && textMatch(card, keyword))); });
       emptyState.style.display = visibleCount === 0 ? "block" : "none";
     }
-
-    filterRow.addEventListener("click", (event) => {
-      const button = event.target.closest(".filter-chip");
-      if (!button) return;
-      state.category = button.dataset.filter;
-      document.querySelectorAll(".filter-chip").forEach((chip) => chip.classList.remove("is-active"));
-      button.classList.add("is-active");
-      applyFilters();
-    });
-
-    searchInput.addEventListener("input", () => {
-      state.keyword = searchInput.value;
-      applyFilters();
-    });
+    filterRow.addEventListener("click", (event) => { const button = event.target.closest(".filter-chip"); if (!button) return; state.category = button.dataset.filter; document.querySelectorAll(".filter-chip").forEach((chip) => chip.classList.remove("is-active")); button.classList.add("is-active"); applyFilters(); });
+    searchInput.addEventListener("input", () => { state.keyword = searchInput.value; applyFilters(); });
   </script>
 </body>
 </html>
